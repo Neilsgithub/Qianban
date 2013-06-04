@@ -11,4 +11,47 @@
         android:layout_height="45dp"
         />
 
+    <com.yugy.qianban.widget.CoverFlow 
+        android:fadingEdge="none"
+        android:background="#000"
+        android:id="@+id/main_coverflow"
+        android:layout_width="match_parent"
+        android:layout_height="330dp"
+        android:layout_below="@id/main_titlebar"
+        />
+    
+    <ImageButton 
+        android:id="@+id/main_lastsong"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/titlebar_button_background"
+        android:layout_below="@id/main_coverflow"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/previous"
+        />
+    
+    <ImageButton 
+        android:layout_centerHorizontal="true"
+        android:id="@+id/main_play"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/titlebar_button_background"
+        android:layout_below="@id/main_coverflow"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/play"
+        />
+    
+    <ImageButton 
+        android:layout_alignParentRight="true"
+        android:id="@+id/main_nextsong"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/titlebar_button_background"
+        android:layout_below="@id/main_coverflow"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/next"
+        />
+    
 </RelativeLayout>

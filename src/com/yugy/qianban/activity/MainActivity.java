@@ -13,23 +13,28 @@ import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.FuncInt;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
+import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.app.Activity;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
 
 	private Titlebar titlebar;
+	private CoverFlow coverFlow;
+	private ImageButton previous;
+	private ImageButton play;
+	private ImageButton next;
 	
 	private String currentSongUrl;
 	
@@ -54,14 +59,41 @@ public class MainActivity extends Activity {
     	titlebar.setLeftButtonIcon(R.drawable.catelog_button_icon);
     	titlebar.setRightButtonIcon(R.drawable.setting_button_icon);
     	
+    	coverFlow = (CoverFlow)findViewById(R.id.main_coverflow);
+    	
+    	previous = (ImageButton)findViewById(R.id.main_lastsong);
+    	play = (ImageButton)findViewById(R.id.main_play);
+    	next = (ImageButton)findViewById(R.id.main_nextsong);
+    	setButtonClick();
+    	
     	douban = new Douban();
     	imageLoader = new ImageLoader(this);
     	albums = new ArrayList<Song>();
     	albumAdapter = new AlbumAdapter();
+    	coverFlow.setAdapter(albumAdapter);
 
     }
     
-    private void getCatelog(){
+    private void setButtonClick() {
+    	previous.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				coverFlow.flipToPrevious();
+			}
+		});
+		next.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				coverFlow.flipToNext();
+			}
+		});
+	}
+
+	private void getCatelog(){
     	douban.getCatalog(new JsonHttpResponseHandler(){
         	@Override
         	public void onSuccess(JSONObject response) {

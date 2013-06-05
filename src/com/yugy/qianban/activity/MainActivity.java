@@ -18,6 +18,7 @@ import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
 
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,6 +42,7 @@ public class MainActivity extends Activity {
 	
 	private int currentSongId;
 	private String currentSongUrl;
+	private boolean isCached;
 	
 	private ArrayList<Song> albums;
 	private Douban douban;
@@ -79,6 +81,24 @@ public class MainActivity extends Activity {
     	coverFlow.setAdapter(albumAdapter);
 
     	mediaPlayer = new MediaPlayer();
+    	mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+			
+			@Override
+			public void onPrepared(MediaPlayer arg0) {
+				// TODO Auto-generated method stub
+				isCached = true;
+				mediaPlayer.start();
+				setAsPlay();
+			}
+		});
+    }
+    
+    private void setAsPlay(){
+    	play.setImageResource(R.drawable.pause);
+    }
+    
+    private void setAsPause(){
+    	play.setImageResource(R.drawable.play);
     }
     
     private void setButtonClick() {
@@ -101,23 +121,24 @@ public class MainActivity extends Activity {
 				coverFlow.flipToPrevious();
 				if(currentSongId != 0){
 					currentSongId--;
+					try {
+						mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
+						mediaPlayer.prepareAsync();
+					} catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalStateException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				try {
-					mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
-					mediaPlayer.prepareAsync();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				
 				
 			}
 		});
@@ -129,7 +150,24 @@ public class MainActivity extends Activity {
 				coverFlow.flipToNext();
 				if(currentSongId != albums.size() - 1){
 					currentSongId++;
+					try {
+						mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
+						mediaPlayer.prepareAsync();
+					} catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalStateException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
+				
 			}
 		});
 		play.setOnClickListener(new OnClickListener() {
@@ -139,10 +177,10 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				if(mediaPlayer.isPlaying()){
 					mediaPlayer.pause();
-					play.setImageResource(R.drawable.play);
-				}else{
+					setAsPause();
+				}else if(isCached){
 					mediaPlayer.start();
-					play.setImageResource(R.drawable.pause);
+					setAsPlay();
 				}
 			}
 		});
@@ -247,5 +285,14 @@ public class MainActivity extends Activity {
 			return image;
 		}
     	
+    }
+    
+    @Override
+    protected void onDestroy() {
+    	// TODO Auto-generated method stub
+    	if(mediaPlayer != null){
+    		mediaPlayer.release();
+    	}
+    	super.onDestroy();
     }
 }

@@ -1,9 +1,13 @@
-package com.yugy.qianban;
+package com.yugy.qianban.activity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.boqi.widget.TagsGridView;
+import com.boqi.qianban.widget.TagsGridView;
+import com.yugy.qianban.R;
+import com.yugy.qianban.R.drawable;
+import com.yugy.qianban.R.id;
+import com.yugy.qianban.R.layout;
 
 import android.app.Activity;
 import android.content.Context;
@@ -58,7 +62,7 @@ public class CatalogActivity extends Activity{
 	
 }
 
-//×Ô¶¨ÒåÊÊÅäÆ÷ 
+//ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
 class PictureAdapter extends BaseAdapter{ 
   private LayoutInflater inflater; 
   private List<Picture> pictures; 

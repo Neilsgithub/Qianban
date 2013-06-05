@@ -1,4 +1,4 @@
-package com.boqi.widget;
+package com.boqi.qianban.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

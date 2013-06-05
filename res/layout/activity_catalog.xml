@@ -19,53 +19,49 @@
             android:layout_height="wrap_content"
             android:text="@string/private_broadcast"
             android:textSize="15sp"/>
-        <com.boqi.widget.TagsGridView 
+        <com.boqi.qianban.widget.TagsGridView 
             android:id="@+id/private_broadcast_catalog"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:numColumns="4"
             android:columnWidth="80dp"
-            android:layout_below="@id/private_broadcast">
-        </com.boqi.widget.TagsGridView >
+            android:layout_below="@id/private_broadcast"/>
         <TextView android:id="@+id/hot_module"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/hot_module"
             android:textSize="15sp"
             android:layout_below="@id/private_broadcast_catalog"/>
-        <com.boqi.widget.TagsGridView  android:id="@+id/hot_module_catalog"
+        <com.boqi.qianban.widget.TagsGridView  android:id="@+id/hot_module_catalog"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:numColumns="4"
             android:columnWidth="80dp"
-            android:layout_below="@id/hot_module">
-        </com.boqi.widget.TagsGridView >
+            android:layout_below="@id/hot_module"/>
         <TextView android:id="@+id/fast_module"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/fast_module"
             android:textSize="15sp"
             android:layout_below="@id/hot_module_catalog"/>
-        <com.boqi.widget.TagsGridView  android:id="@+id/fast_module_catalog"
+        <com.boqi.qianban.widget.TagsGridView  android:id="@+id/fast_module_catalog"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:numColumns="4"
             android:columnWidth="80dp"
-            android:layout_below="@id/fast_module">
-        </com.boqi.widget.TagsGridView >
+            android:layout_below="@id/fast_module"/>
         <TextView android:id="@+id/com_module"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/com_module"
             android:textSize="15sp"
             android:layout_below="@id/fast_module_catalog"/>
-        <com.boqi.widget.TagsGridView  android:id="@+id/com_module_catalog"
+        <com.boqi.qianban.widget.TagsGridView  android:id="@+id/com_module_catalog"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:numColumns="4"
             android:columnWidth="80dp"
-            android:layout_below="@id/com_module">
-        </com.boqi.widget.TagsGridView >
+            android:layout_below="@id/com_module"/>
     </RelativeLayout>
 </ScrollView>
 

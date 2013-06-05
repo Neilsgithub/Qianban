@@ -1,5 +1,6 @@
 package com.yugy.qianban.activity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -16,6 +17,7 @@ import com.yugy.qianban.sdk.Douban;
 import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,6 +28,7 @@ import android.widget.Gallery.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.app.Activity;
+import android.content.Intent;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
@@ -36,6 +39,7 @@ public class MainActivity extends Activity {
 	private ImageButton play;
 	private ImageButton next;
 	
+	private int currentSongId;
 	private String currentSongUrl;
 	
 	private ArrayList<Song> albums;
@@ -43,6 +47,8 @@ public class MainActivity extends Activity {
 	private ImageLoader imageLoader;
 	private JSONObject catelog;
 	private AlbumAdapter albumAdapter;
+	private MediaPlayer mediaPlayer;
+	
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,15 +78,47 @@ public class MainActivity extends Activity {
     	albumAdapter = new AlbumAdapter();
     	coverFlow.setAdapter(albumAdapter);
 
+    	mediaPlayer = new MediaPlayer();
     }
     
     private void setButtonClick() {
+    	titlebar.setLeftClick(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(MainActivity.this, CatalogActivity.class);
+				intent.putExtra("json", catelog.toString());
+				startActivity(intent);
+			}
+		});
+    	
     	previous.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				coverFlow.flipToPrevious();
+				if(currentSongId != 0){
+					currentSongId--;
+				}
+				try {
+					mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
+					mediaPlayer.prepareAsync();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalStateException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 		});
 		next.setOnClickListener(new OnClickListener() {
@@ -89,6 +127,23 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				coverFlow.flipToNext();
+				if(currentSongId != albums.size() - 1){
+					currentSongId++;
+				}
+			}
+		});
+		play.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				if(mediaPlayer.isPlaying()){
+					mediaPlayer.pause();
+					play.setImageResource(R.drawable.play);
+				}else{
+					mediaPlayer.start();
+					play.setImageResource(R.drawable.pause);
+				}
 			}
 		});
 	}
@@ -121,6 +176,23 @@ public class MainActivity extends Activity {
 					}
     			}
     			albumAdapter.notifyDataSetChanged();
+    			currentSongId = 0;
+    			try {
+					mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
+					mediaPlayer.prepareAsync();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalStateException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     			super.onSuccess(response);
     		}
     		
@@ -143,7 +215,7 @@ public class MainActivity extends Activity {
 		@Override
 		public Object getItem(int arg0) {
 			// TODO Auto-generated method stub
-			ImageView image = new ImageView(MainActivity.this);
+			final ImageView image = new ImageView(MainActivity.this);
 			LayoutParams layoutParams = new LayoutParams(FuncInt.dp(MainActivity.this, 175), FuncInt.dp(MainActivity.this, 175));
 			image.setLayoutParams(layoutParams);
 			imageLoader.DisplayImage(albums.get(arg0).albumCoverUrl, image);

@@ -4,5 +4,9 @@
     <string name="app_name">Qianban</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="private_broadcast">私人电台</string>
+    <string name="hot_module">热门兆赫</string>
+    <string name="fast_module">上升最快</string>
+    <string name="com_module">品牌兆赫</string>
 
 </resources>

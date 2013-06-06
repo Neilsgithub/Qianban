@@ -19,7 +19,9 @@
         android:id="@+id/name"
         android:layout_width="75dp"
         android:layout_height="31dp"
-        android:gravity="center"
+        android:textColor="#000"
+        android:textSize="12sp"
+        android:gravity="center_horizontal"
         android:layout_below="@id/image"
         android:lines="2"
         />

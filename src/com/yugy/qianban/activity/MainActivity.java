@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import com.fedorvlasov.lazylist.ImageLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.qianban.R;
+import com.yugy.qianban.asisClass.Conf;
 import com.yugy.qianban.asisClass.FuncInt;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
@@ -59,6 +60,7 @@ public class MainActivity extends Activity {
 	private MediaPlayer mediaPlayer;
 	private Timer timer;
 	private TimerTask timerTask;
+	String CatalogId = "";
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,6 +236,16 @@ public class MainActivity extends Activity {
     	}
     }
     
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	// TODO Auto-generated method stub
+    	
+    	if(requestCode == Conf.REQUEST_CATALOG_CODE && resultCode == Conf.REQUEST_CATALOG_OK){
+    		CatalogId = data.getStringExtra("id");
+    	}
+    	super.onActivityResult(requestCode, resultCode, data);
+    }
+    
     private void setButtonClick() {
     	titlebar.setLeftClick(new OnClickListener() {
 			
@@ -243,7 +255,7 @@ public class MainActivity extends Activity {
 				if(catelog != null){
 					Intent intent = new Intent(MainActivity.this, CatalogActivity.class);
 					intent.putExtra("json", catelog.toString());
-					startActivity(intent);
+					startActivityForResult(intent, Conf.REQUEST_CATALOG_CODE);
 				}
 			}
 		});

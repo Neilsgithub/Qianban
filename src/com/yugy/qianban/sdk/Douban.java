@@ -7,16 +7,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.PersistentCookieStore;
 
 public class Douban {
 	
 	private AsyncHttpClient client;
 	
-	public Douban(){
+	public Douban(Context context){
 		client = new AsyncHttpClient();
+		client.setCookieStore(new PersistentCookieStore(context));
 	}
 	
 	public void getCatalog(final JsonHttpResponseHandler responseHandler){
@@ -46,7 +50,7 @@ public class Douban {
 					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
-					//json½âÎöÊ§°Ü
+					//jsonï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½
 					e.printStackTrace();
 				}
 				responseHandler.onSuccess(result);

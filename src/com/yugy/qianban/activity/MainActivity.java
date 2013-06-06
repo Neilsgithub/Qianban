@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import com.fedorvlasov.lazylist.ImageLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.qianban.R;
+import com.yugy.qianban.asisClass.Func;
 import com.yugy.qianban.asisClass.FuncInt;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
@@ -35,6 +36,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 import android.app.Activity;
 import android.content.Intent;
 
@@ -47,6 +49,8 @@ public class MainActivity extends Activity {
 	private ImageButton play;
 	private ImageButton next;
 	private SeekBar seekBar;
+	private TextView song;
+	private TextView author;
 	
 	private int currentSongId;
 	private boolean isCached;
@@ -82,7 +86,10 @@ public class MainActivity extends Activity {
     	next = (ImageButton)findViewById(R.id.main_nextsong);
     	setButtonClick();
     	
-    	douban = new Douban();
+    	song = (TextView)findViewById(R.id.main_infosong);
+    	author = (TextView)findViewById(R.id.main_infoauthor);
+    	
+    	douban = new Douban(this);
     	imageLoader = new ImageLoader(this);
     	albums = new ArrayList<Song>();
     	albumAdapter = new AlbumAdapter();
@@ -92,7 +99,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
-				// TODO Auto-generated method stub
+				song.setText(albums.get(arg2).title);
+				author.setText(albums.get(arg2).author + " - " + albums.get(arg2).albumName);
 				if(arg2 > currentSongId){
 					nextSong();
 				}else if(arg2 < currentSongId){
@@ -102,7 +110,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 		});
@@ -111,21 +119,24 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onStopTrackingTouch(SeekBar arg0) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			
 			@Override
 			public void onStartTrackingTouch(SeekBar arg0) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 			
 			@Override
 			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-				// TODO Auto-generated method stub
+				
 				if(arg2){
 					mediaPlayer.seekTo(arg1);
+					if(!mediaPlayer.isPlaying()){
+						mediaPlayer.start();
+					}
 				}
 			}
 		});
@@ -135,7 +146,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
+				
 				if(mediaPlayer.isPlaying()){
 					seekBar.setProgress(mediaPlayer.getCurrentPosition());
 				}
@@ -150,7 +161,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onPrepared(MediaPlayer arg0) {
-				// TODO Auto-generated method stub
+				
 				isCached = true;
 				mediaPlayer.start();
 				seekBar.setMax(mediaPlayer.getDuration());
@@ -161,21 +172,13 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onCompletion(MediaPlayer arg0) {
-				// TODO Auto-generated method stub
+				
 				if(currentSongId != albums.size() - 1){
 					nextSong();
 					coverFlow.flipToNext();
 				}else{
 					setAsPause();
 				}
-			}
-		});
-    	mediaPlayer.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
-			
-			@Override
-			public void onBufferingUpdate(MediaPlayer arg0, int arg1) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
     }
@@ -193,18 +196,19 @@ public class MainActivity extends Activity {
 			currentSongId--;
 			mediaPlayer.reset();
 			try {
+				Func.log("Start to cache " + albums.get(currentSongId).songUrl);
 				mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			mediaPlayer.prepareAsync();
@@ -216,18 +220,19 @@ public class MainActivity extends Activity {
 			currentSongId++;
 			mediaPlayer.reset();
 			try {
+				Func.log("Start to cache " + albums.get(currentSongId).songUrl);
 				mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 			mediaPlayer.prepareAsync();
@@ -239,7 +244,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+				
 				if(catelog != null){
 					Intent intent = new Intent(MainActivity.this, CatalogActivity.class);
 					intent.putExtra("json", catelog.toString());
@@ -252,7 +257,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+				
 				coverFlow.flipToPrevious();
 				lastSong();
 			}
@@ -261,7 +266,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				
 				coverFlow.flipToNext();
 				nextSong();
 			}
@@ -270,7 +275,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+				
 				if(mediaPlayer.isPlaying()){
 					mediaPlayer.pause();
 					setAsPause();
@@ -286,7 +291,7 @@ public class MainActivity extends Activity {
     	douban.getCatalog(new JsonHttpResponseHandler(){
         	@Override
         	public void onSuccess(JSONObject response) {
-        		// TODO Auto-generated method stub
+        		
         		catelog= response;
         		super.onSuccess(response);
         	}
@@ -297,7 +302,7 @@ public class MainActivity extends Activity {
     	douban.getSongs(catalogId, new JsonHttpResponseHandler(){
     		@Override
     		public void onSuccess(JSONArray response) {
-    			// TODO Auto-generated method stub
+    			
     			Song song;
     			for(int i = 0; i < response.length(); i++){
     				song = new Song();
@@ -305,26 +310,27 @@ public class MainActivity extends Activity {
 						song.parse(response.getJSONObject(i));
 						albums.add(song);
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 					}
     			}
     			albumAdapter.notifyDataSetChanged();
     			currentSongId = 0;
     			try {
+    				Func.log("Start to cache " + albums.get(currentSongId).songUrl);
 					mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
 					mediaPlayer.prepareAsync();
 				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				} catch (IllegalStateException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
     			super.onSuccess(response);
@@ -332,7 +338,7 @@ public class MainActivity extends Activity {
     		
     		@Override
     		public void onFailure(Throwable error, String content) {
-    			// TODO Auto-generated method stub
+    			
     			super.onFailure(error, content);
     		}
     	});
@@ -342,15 +348,15 @@ public class MainActivity extends Activity {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
+			
 			return albums.size();
 		}
 
 		@Override
 		public Object getItem(int arg0) {
-			// TODO Auto-generated method stub
+			
 			final ImageView image = new ImageView(MainActivity.this);
-			LayoutParams layoutParams = new LayoutParams(FuncInt.dp(MainActivity.this, 175), FuncInt.dp(MainActivity.this, 175));
+			LayoutParams layoutParams = new LayoutParams(FuncInt.dp(MainActivity.this, 140), FuncInt.dp(MainActivity.this, 140));
 			image.setLayoutParams(layoutParams);
 			imageLoader.DisplayImage(albums.get(arg0).albumCoverUrl, image);
 //			songName.setText(albums.get(arg0).albumName);
@@ -360,17 +366,17 @@ public class MainActivity extends Activity {
 
 		@Override
 		public long getItemId(int arg0) {
-			// TODO Auto-generated method stub
+			
 			return arg0;
 		}
 
 		@Override
 		public View getView(int arg0, View arg1, ViewGroup arg2) {
-			// TODO Auto-generated method stub
+			
 			ImageView image;
 			if(arg1 == null){
 				image = new ImageView(MainActivity.this);
-				LayoutParams layoutParams = new LayoutParams(FuncInt.dp(MainActivity.this, 175), FuncInt.dp(MainActivity.this, 175));
+				LayoutParams layoutParams = new LayoutParams(FuncInt.dp(MainActivity.this, 140), FuncInt.dp(MainActivity.this, 140));
 				image.setLayoutParams(layoutParams);
 			}else{
 				image = (ImageView) arg1;
@@ -385,10 +391,8 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onDestroy() {
-    	// TODO Auto-generated method stub
-    	if(mediaPlayer != null){
-    		mediaPlayer.release();
-    	}
+    	
+    	mediaPlayer.release();
     	timerTask.cancel();
     	super.onDestroy();
     }

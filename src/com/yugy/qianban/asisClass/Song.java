@@ -9,6 +9,7 @@ public class Song {
 	public String songUrl;
 	public String author;
 	public String albumName;
+	public String title;
 	
 	public void parse(JSONObject json){
 		try {
@@ -19,6 +20,7 @@ public class Song {
 			songUrl = json.getString("url");
 			author = json.getString("artist");
 			albumName = json.getString("albumtitle");
+			title = json.getString("title");
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

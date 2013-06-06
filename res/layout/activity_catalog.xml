@@ -5,84 +5,103 @@
     android:background="#FFF"
     tools:context=".MainActivity" >
 
-<ScrollView 
-    android:id="@+id/catalog"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
-    <RelativeLayout 
-        android:id="@+id/fullcatalog"
+    <ScrollView
+        android:id="@+id/catalog"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" 	>
-        <TextView 
-            android:id="@+id/private_broadcast"
+        android:layout_height="wrap_content" >
+
+        <RelativeLayout
+            android:id="@+id/fullcatalog"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/private_broadcast"
-            android:paddingLeft="12sp"
-            android:paddingTop="3sp"
-            android:paddingBottom="3sp"
-            android:textColor="#000"
-            android:background="#CCC"
-            android:textSize="12sp"/>
-        <com.boqi.qianban.widget.TagsGridView 
-            android:id="@+id/private_broadcast_catalog"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:numColumns="4"
-            android:columnWidth="80dp"
-            android:layout_below="@id/private_broadcast"/>
-        <TextView android:id="@+id/hot_module"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hot_module"
-            android:textSize="12sp"
-            android:paddingLeft="12sp"
-            android:paddingTop="3sp"
-            android:paddingBottom="3sp"
-            android:textColor="#000"
-            android:background="#CCC"
-            android:layout_below="@id/private_broadcast_catalog"/>
-        <com.boqi.qianban.widget.TagsGridView  android:id="@+id/hot_module_catalog"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:numColumns="4"
-            android:columnWidth="80dp"
-            android:layout_below="@id/hot_module"/>
-        <TextView android:id="@+id/fast_module"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/fast_module"
-            android:paddingLeft="12sp"
-            android:paddingTop="3sp"
-            android:paddingBottom="3sp"
-            android:textColor="#000"
-            android:background="#CCC"
-            android:textSize="12sp"
-            android:layout_below="@id/hot_module_catalog"/>
-        <com.boqi.qianban.widget.TagsGridView  android:id="@+id/fast_module_catalog"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:numColumns="4"
-            android:columnWidth="80dp"
-            android:layout_below="@id/fast_module"/>
-        <TextView android:id="@+id/com_module"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/com_module"
-            android:paddingLeft="12sp"
-            android:paddingTop="3sp"
-            android:paddingBottom="3sp"
-            android:textColor="#000"
-            android:background="#CCC"
-            android:textSize="12sp"
-            android:layout_below="@id/fast_module_catalog"/>
-        <com.boqi.qianban.widget.TagsGridView  android:id="@+id/com_module_catalog"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:numColumns="4"
-            android:columnWidth="80dp"
-            android:layout_below="@id/com_module"/>
-    </RelativeLayout>
-</ScrollView>
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/private_broadcast"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#CCC"
+                android:paddingBottom="3sp"
+                android:paddingLeft="12sp"
+                android:paddingTop="3sp"
+                android:text="@string/private_broadcast"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <com.boqi.qianban.widget.TagsGridView
+                android:id="@+id/private_broadcast_catalog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/private_broadcast"
+                android:background="#FFF"
+                android:numColumns="4" />
+
+            <TextView
+                android:id="@+id/hot_module"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/private_broadcast_catalog"
+                android:background="#CCC"
+                android:paddingBottom="3sp"
+                android:paddingLeft="12sp"
+                android:paddingTop="3sp"
+                android:text="@string/hot_module"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <com.boqi.qianban.widget.TagsGridView
+                android:listSelector="@color/transparent"
+                android:id="@+id/hot_module_catalog"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/hot_module"
+                android:background="#FFF"
+                android:columnWidth="80dp"
+                android:numColumns="4" />
+
+            <TextView
+                android:id="@+id/fast_module"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/hot_module_catalog"
+                android:background="#CCC"
+                android:paddingBottom="3sp"
+                android:paddingLeft="12sp"
+                android:paddingTop="3sp"
+                android:text="@string/fast_module"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <com.boqi.qianban.widget.TagsGridView
+                android:id="@+id/fast_module_catalog"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fast_module"
+                android:background="#FFF"
+                android:columnWidth="80dp"
+                android:numColumns="4" />
+
+            <TextView
+                android:id="@+id/com_module"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fast_module_catalog"
+                android:background="#CCC"
+                android:paddingBottom="3sp"
+                android:paddingLeft="12sp"
+                android:paddingTop="3sp"
+                android:text="@string/com_module"
+                android:textColor="#000"
+                android:textSize="12sp" />
+
+            <com.boqi.qianban.widget.TagsGridView
+                android:id="@+id/com_module_catalog"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/com_module"
+                android:background="#FFF"
+                android:columnWidth="80dp"
+                android:numColumns="4" />
+        </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>

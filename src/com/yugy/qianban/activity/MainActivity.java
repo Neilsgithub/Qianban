@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
@@ -64,7 +65,7 @@ public class MainActivity extends Activity {
 	private MediaPlayer mediaPlayer;
 	private Timer timer;
 	private TimerTask timerTask;
-	String CatalogId = "";
+	String catalogId = "1";
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         init();
         getCatelog();
-        getSongs("1");
+        getSongs(catalogId);
     }
     
     private void init(){
@@ -95,27 +96,8 @@ public class MainActivity extends Activity {
     	imageLoader = new ImageLoader(this);
     	albums = new ArrayList<Song>();
     	albumAdapter = new AlbumAdapter();
-    	coverFlow.setAdapter(albumAdapter);
-    	coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
-				song.setText(albums.get(arg2).title);
-				author.setText(albums.get(arg2).author + " - " + albums.get(arg2).albumName);
-				if(arg2 > currentSongId){
-					nextSong();
-				}else if(arg2 < currentSongId){
-					lastSong();
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				
-				
-			}
-		});
+    	
+    	initCoverFlow();
     	seekBar = (SeekBar)findViewById(R.id.main_seekbar);
     	seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
@@ -155,6 +137,40 @@ public class MainActivity extends Activity {
 			}
 		};
 		timer.schedule(timerTask, 0, 1000);
+    }
+    
+    private void initCoverFlow(){
+    	coverFlow.setAdapter(albumAdapter);
+    	coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				song.setText(albums.get(arg2).title);
+				author.setText(albums.get(arg2).author + " - " + albums.get(arg2).albumName);
+				if(arg2 > currentSongId){
+					nextSong();
+				}else if(arg2 < currentSongId){
+					lastSong();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				
+				
+			}
+		});
+    	coverFlow.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				if(arg2 == currentSongId){
+					//Func.toast(MainActivity.this, "123");
+				}
+			}
+		});
     }
     
     private void initMediaPlayer(){
@@ -228,7 +244,6 @@ public class MainActivity extends Activity {
 				
 				e.printStackTrace();
 			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalStateException e) {
 				
@@ -243,10 +258,11 @@ public class MainActivity extends Activity {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	// TODO Auto-generated method stub
     	
     	if(requestCode == Conf.REQUEST_CATALOG_CODE && resultCode == Conf.REQUEST_CATALOG_OK){
-    		CatalogId = data.getStringExtra("id");
+    		catalogId = data.getStringExtra("id");
+    		albums = new ArrayList<Song>();
+    		getSongs(catalogId);
     	}
     	super.onActivityResult(requestCode, resultCode, data);
     }
@@ -310,8 +326,9 @@ public class MainActivity extends Activity {
         });
     }
     
-    private void getSongs(String catalogId){
-    	douban.getSongs(catalogId, new JsonHttpResponseHandler(){
+    private void getSongs(String id){
+    	mediaPlayer.reset();
+    	douban.getSongs(id, new JsonHttpResponseHandler(){
     		@Override
     		public void onSuccess(JSONArray response) {
     			
@@ -327,6 +344,9 @@ public class MainActivity extends Activity {
 					}
     			}
     			albumAdapter.notifyDataSetChanged();
+    			coverFlow.setSelection(0);
+    			MainActivity.this.song.setText(albums.get(0).title);
+				author.setText(albums.get(0).author + " - " + albums.get(0).albumName);
     			currentSongId = 0;
     			try {
     				Func.log("Start to cache " + albums.get(currentSongId).songUrl);

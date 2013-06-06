@@ -20,12 +20,20 @@
         android:layout_below="@id/main_titlebar"
         />
     
+    <SeekBar 
+        android:layout_marginTop="-15dp"
+        android:id="@+id/main_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_coverflow"
+        />
+    
     <ImageButton 
         android:id="@+id/main_lastsong"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@drawable/titlebar_button_background"
-        android:layout_below="@id/main_coverflow"
+        android:layout_below="@id/main_seekbar"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:src="@drawable/previous"
@@ -37,7 +45,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@drawable/titlebar_button_background"
-        android:layout_below="@id/main_coverflow"
+        android:layout_below="@id/main_seekbar"
         android:layout_marginTop="10dp"
         android:src="@drawable/play"
         />
@@ -48,7 +56,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@drawable/titlebar_button_background"
-        android:layout_below="@id/main_coverflow"
+        android:layout_below="@id/main_seekbar"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:src="@drawable/next"

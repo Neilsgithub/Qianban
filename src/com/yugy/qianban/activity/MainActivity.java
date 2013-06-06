@@ -2,6 +2,8 @@ package com.yugy.qianban.activity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,16 +20,21 @@ import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
 
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.app.Activity;
 import android.content.Intent;
 
@@ -39,9 +46,9 @@ public class MainActivity extends Activity {
 	private ImageButton previous;
 	private ImageButton play;
 	private ImageButton next;
+	private SeekBar seekBar;
 	
 	private int currentSongId;
-	private String currentSongUrl;
 	private boolean isCached;
 	
 	private ArrayList<Song> albums;
@@ -50,7 +57,8 @@ public class MainActivity extends Activity {
 	private JSONObject catelog;
 	private AlbumAdapter albumAdapter;
 	private MediaPlayer mediaPlayer;
-	
+	private Timer timer;
+	private TimerTask timerTask;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +87,64 @@ public class MainActivity extends Activity {
     	albums = new ArrayList<Song>();
     	albumAdapter = new AlbumAdapter();
     	coverFlow.setAdapter(albumAdapter);
+    	coverFlow.setOnItemSelectedListener(new OnItemSelectedListener() {
 
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				if(arg2 > currentSongId){
+					nextSong();
+				}else if(arg2 < currentSongId){
+					lastSong();
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+    	seekBar = (SeekBar)findViewById(R.id.main_seekbar);
+    	seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+				// TODO Auto-generated method stub
+				if(arg2){
+					mediaPlayer.seekTo(arg1);
+				}
+			}
+		});
+    	initMediaPlayer();
+    	timer = new Timer();
+    	timerTask = new TimerTask() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				if(mediaPlayer.isPlaying()){
+					seekBar.setProgress(mediaPlayer.getCurrentPosition());
+				}
+			}
+		};
+		timer.schedule(timerTask, 0, 1000);
+    }
+    
+    private void initMediaPlayer(){
     	mediaPlayer = new MediaPlayer();
     	mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 			
@@ -88,7 +153,29 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				isCached = true;
 				mediaPlayer.start();
+				seekBar.setMax(mediaPlayer.getDuration());
 				setAsPlay();
+			}
+		});
+    	mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+			
+			@Override
+			public void onCompletion(MediaPlayer arg0) {
+				// TODO Auto-generated method stub
+				if(currentSongId != albums.size() - 1){
+					nextSong();
+					coverFlow.flipToNext();
+				}else{
+					setAsPause();
+				}
+			}
+		});
+    	mediaPlayer.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
+			
+			@Override
+			public void onBufferingUpdate(MediaPlayer arg0, int arg1) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
     }
@@ -101,15 +188,63 @@ public class MainActivity extends Activity {
     	play.setImageResource(R.drawable.play);
     }
     
+    private void lastSong(){
+    	if(currentSongId != 0){
+			currentSongId--;
+			mediaPlayer.reset();
+			try {
+				mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			mediaPlayer.prepareAsync();
+    	}
+    }
+    
+    private void nextSong(){
+    	if(currentSongId != albums.size() - 1){
+			currentSongId++;
+			mediaPlayer.reset();
+			try {
+				mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			mediaPlayer.prepareAsync();
+    	}
+    }
+    
     private void setButtonClick() {
     	titlebar.setLeftClick(new OnClickListener() {
 			
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(MainActivity.this, CatalogActivity.class);
-				intent.putExtra("json", catelog.toString());
-				startActivity(intent);
+				if(catelog != null){
+					Intent intent = new Intent(MainActivity.this, CatalogActivity.class);
+					intent.putExtra("json", catelog.toString());
+					startActivity(intent);
+				}
 			}
 		});
     	
@@ -119,27 +254,7 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				coverFlow.flipToPrevious();
-				if(currentSongId != 0){
-					currentSongId--;
-					try {
-						mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
-						mediaPlayer.prepareAsync();
-					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalStateException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
-				
+				lastSong();
 			}
 		});
 		next.setOnClickListener(new OnClickListener() {
@@ -148,26 +263,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				coverFlow.flipToNext();
-				if(currentSongId != albums.size() - 1){
-					currentSongId++;
-					try {
-						mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
-						mediaPlayer.prepareAsync();
-					} catch (IllegalArgumentException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SecurityException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IllegalStateException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				
+				nextSong();
 			}
 		});
 		play.setOnClickListener(new OnClickListener() {
@@ -293,6 +389,7 @@ public class MainActivity extends Activity {
     	if(mediaPlayer != null){
     		mediaPlayer.release();
     	}
+    	timerTask.cancel();
     	super.onDestroy();
     }
 }

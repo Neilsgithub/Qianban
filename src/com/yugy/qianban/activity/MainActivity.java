@@ -1,10 +1,6 @@
 package com.yugy.qianban.activity;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,18 +10,15 @@ import com.fedorvlasov.lazylist.ImageLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.Conf;
-import com.yugy.qianban.asisClass.Func;
 import com.yugy.qianban.asisClass.FuncInt;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
+import com.yugy.qianban.service.MusicService;
 import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
 
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -37,10 +30,12 @@ import android.widget.Gallery.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
@@ -54,17 +49,14 @@ public class MainActivity extends Activity {
 	private TextView song;
 	private TextView author;
 	
-	private int currentSongId;
-	private boolean isCached;
+//	private int currentSongId;
 	
 	private ArrayList<Song> albums;
 	private Douban douban;
+	private MusicService musicService;
 	private ImageLoader imageLoader;
 	private JSONObject catelog;
 	private AlbumAdapter albumAdapter;
-	private MediaPlayer mediaPlayer;
-	private Timer timer;
-	private TimerTask timerTask;
 	String catalogId = "1";
 	
     @Override
@@ -73,10 +65,27 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         init();
         getCatelog();
-        getSongs(catalogId);
     }
     
     private void init(){
+    	Intent intent = new Intent(this, MusicService.class);
+    	bindService(intent, new ServiceConnection() {
+			
+			@Override
+			public void onServiceDisconnected(ComponentName arg0) {
+				musicService = null;
+			}
+			
+			@Override
+			public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+				musicService = ((MusicService.LocalBinder)arg1).getService();
+				setButtonClick();
+				initCoverFlow();
+				musicService.setSeekbar(seekBar);
+				getSongs(catalogId);
+			}
+		}, Context.BIND_AUTO_CREATE);
+    	
     	titlebar = (Titlebar)findViewById(R.id.main_titlebar);
     	titlebar.setTitle("Qianban");
     	titlebar.setLeftButtonIcon(R.drawable.catelog_button_icon);
@@ -87,7 +96,6 @@ public class MainActivity extends Activity {
     	previous = (ImageButton)findViewById(R.id.main_lastsong);
     	play = (ImageButton)findViewById(R.id.main_play);
     	next = (ImageButton)findViewById(R.id.main_nextsong);
-    	setButtonClick();
     	
     	song = (TextView)findViewById(R.id.main_infosong);
     	author = (TextView)findViewById(R.id.main_infoauthor);
@@ -97,46 +105,7 @@ public class MainActivity extends Activity {
     	albums = new ArrayList<Song>();
     	albumAdapter = new AlbumAdapter();
     	
-    	initCoverFlow();
     	seekBar = (SeekBar)findViewById(R.id.main_seekbar);
-    	seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-			
-			@Override
-			public void onStopTrackingTouch(SeekBar arg0) {
-				
-				
-			}
-			
-			@Override
-			public void onStartTrackingTouch(SeekBar arg0) {
-				
-				
-			}
-			
-			@Override
-			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-				
-				if(arg2){
-					mediaPlayer.seekTo(arg1);
-					if(!mediaPlayer.isPlaying()){
-						mediaPlayer.start();
-					}
-				}
-			}
-		});
-    	initMediaPlayer();
-    	timer = new Timer();
-    	timerTask = new TimerTask() {
-			
-			@Override
-			public void run() {
-				
-				if(mediaPlayer.isPlaying()){
-					seekBar.setProgress(mediaPlayer.getCurrentPosition());
-				}
-			}
-		};
-		timer.schedule(timerTask, 0, 1000);
     }
     
     private void initCoverFlow(){
@@ -148,10 +117,10 @@ public class MainActivity extends Activity {
 					int arg2, long arg3) {
 				song.setText(albums.get(arg2).title);
 				author.setText(albums.get(arg2).author + " - " + albums.get(arg2).albumName);
-				if(arg2 > currentSongId){
-					nextSong();
-				}else if(arg2 < currentSongId){
-					lastSong();
+				if(arg2 > musicService.currentSongId){
+					musicService.nextSongWithoutFlip();
+				}else if(arg2 < musicService.currentSongId){
+					musicService.lastSongWithoutFlip();
 				}
 			}
 
@@ -166,94 +135,12 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				if(arg2 == currentSongId){
+				if(arg2 == musicService.currentSongId){
 					//Func.toast(MainActivity.this, "123");
 				}
 			}
 		});
-    }
-    
-    private void initMediaPlayer(){
-    	mediaPlayer = new MediaPlayer();
-    	mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
-			
-			@Override
-			public void onPrepared(MediaPlayer arg0) {
-				
-				isCached = true;
-				mediaPlayer.start();
-				seekBar.setMax(mediaPlayer.getDuration());
-				setAsPlay();
-			}
-		});
-    	mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-			
-			@Override
-			public void onCompletion(MediaPlayer arg0) {
-				
-				if(currentSongId != albums.size() - 1){
-					nextSong();
-					coverFlow.flipToNext();
-				}else{
-					setAsPause();
-				}
-			}
-		});
-    }
-    
-    private void setAsPlay(){
-    	play.setImageResource(R.drawable.pause);
-    }
-    
-    private void setAsPause(){
-    	play.setImageResource(R.drawable.play);
-    }
-    
-    private void lastSong(){
-    	if(currentSongId != 0){
-			currentSongId--;
-			mediaPlayer.reset();
-			try {
-				Func.log("Start to cache " + albums.get(currentSongId).songUrl);
-				mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
-			} catch (IllegalArgumentException e) {
-				
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				
-				e.printStackTrace();
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			}
-			mediaPlayer.prepareAsync();
-    	}
-    }
-    
-    private void nextSong(){
-    	if(currentSongId != albums.size() - 1){
-			currentSongId++;
-			mediaPlayer.reset();
-			try {
-				Func.log("Start to cache " + albums.get(currentSongId).songUrl);
-				mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
-			} catch (IllegalArgumentException e) {
-				
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				
-				e.printStackTrace();
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			}
-			mediaPlayer.prepareAsync();
-    	}
+    	musicService.setCoverFlow(coverFlow);
     }
     
     @Override
@@ -285,34 +172,17 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View arg0) {
-				
-				coverFlow.flipToPrevious();
-				lastSong();
+				musicService.playLastSong();
 			}
 		});
 		next.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				
-				coverFlow.flipToNext();
-				nextSong();
+				musicService.playNextSong();
 			}
 		});
-		play.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View arg0) {
-				
-				if(mediaPlayer.isPlaying()){
-					mediaPlayer.pause();
-					setAsPause();
-				}else if(isCached){
-					mediaPlayer.start();
-					setAsPlay();
-				}
-			}
-		});
+		musicService.setPlayButton(play);
 	}
 
 	private void getCatelog(){
@@ -327,7 +197,7 @@ public class MainActivity extends Activity {
     }
     
     private void getSongs(String id){
-    	mediaPlayer.reset();
+    	musicService.resetMediaPlayer();
     	douban.getSongs(id, new JsonHttpResponseHandler(){
     		@Override
     		public void onSuccess(JSONArray response) {
@@ -347,24 +217,7 @@ public class MainActivity extends Activity {
     			coverFlow.setSelection(0);
     			MainActivity.this.song.setText(albums.get(0).title);
 				author.setText(albums.get(0).author + " - " + albums.get(0).albumName);
-    			currentSongId = 0;
-    			try {
-    				Func.log("Start to cache " + albums.get(currentSongId).songUrl);
-					mediaPlayer.setDataSource(albums.get(currentSongId).songUrl);
-					mediaPlayer.prepareAsync();
-				} catch (IllegalArgumentException e) {
-					
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					
-					e.printStackTrace();
-				} catch (IllegalStateException e) {
-					
-					e.printStackTrace();
-				} catch (IOException e) {
-					
-					e.printStackTrace();
-				}
+				musicService.setSongList(albums);
     			super.onSuccess(response);
     		}
     		
@@ -391,8 +244,6 @@ public class MainActivity extends Activity {
 			LayoutParams layoutParams = new LayoutParams(FuncInt.dp(MainActivity.this, 140), FuncInt.dp(MainActivity.this, 140));
 			image.setLayoutParams(layoutParams);
 			imageLoader.DisplayImage(albums.get(arg0).albumCoverUrl, image);
-//			songName.setText(albums.get(arg0).albumName);
-//			authorName.setText(albums.get(arg0).author);
 			return image;
 		}
 
@@ -414,18 +265,8 @@ public class MainActivity extends Activity {
 				image = (ImageView) arg1;
 			}
 			imageLoader.DisplayImage(albums.get(arg0).albumCoverUrl, image);
-//			songName.setText(albums.get(arg0).albumName);
-//			authorName.setText(albums.get(arg0).author);
 			return image;
 		}
     	
-    }
-    
-    @Override
-    protected void onDestroy() {
-    	
-    	mediaPlayer.release();
-    	timerTask.cancel();
-    	super.onDestroy();
     }
 }

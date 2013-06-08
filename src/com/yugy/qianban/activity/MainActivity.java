@@ -26,7 +26,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Animation.AnimationListener;
-import android.view.animation.RotateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -110,6 +109,10 @@ public class MainActivity extends Activity {
     	author = (TextView)findViewById(R.id.main_infoauthor);
     	
     	lrc = (TextView)findViewById(R.id.main_lrc);
+    	Rotate3DAnimation animation = new Rotate3DAnimation(0, 180, FuncInt.getScreenWidth(this) / 2, 0, 0, false);
+    	animation.setDuration(0);
+    	animation.setFillAfter(true);
+    	lrc.startAnimation(animation);
     	lrc.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {

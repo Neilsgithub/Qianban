@@ -16,20 +16,21 @@
         android:id="@+id/main_coverflowlayout"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:background="#000"
         >
         
         <TextView 
+            android:background="#000"
             android:id="@+id/main_lrc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="lrc"
+            android:text="abcdefghijk"
             android:textColor="#FFF"
             android:visibility="gone"
             
             />
         
         <com.yugy.qianban.widget.CoverFlow 
+            android:background="#000"
 	        android:fadingEdge="none"
 	        android:id="@+id/main_coverflow"
 	        android:layout_width="match_parent"

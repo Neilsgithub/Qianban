@@ -95,7 +95,6 @@ public class MusicService extends Service{
 	}
 	
 	public void resetMediaPlayer(){
-		mediaPlayer.stop();
 		mediaPlayer.reset();
 	}
 	
@@ -221,6 +220,7 @@ public class MusicService extends Service{
 		if(mediaPlayer != null){
 			mediaPlayer.release();
 		}
+		timerTask.cancel();
 		timer.cancel();
 		super.onDestroy();
 	}

@@ -1,7 +1,5 @@
 package com.yugy.qianban.sdk;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +8,6 @@ import org.json.JSONObject;
 import android.content.Context;
 
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
 

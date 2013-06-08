@@ -11,6 +11,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.Conf;
 import com.yugy.qianban.asisClass.FuncInt;
+import com.yugy.qianban.asisClass.Rotate3DAnimation;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
 import com.yugy.qianban.service.MusicService;
@@ -21,6 +22,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.RotateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -29,6 +35,7 @@ import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.app.Activity;
@@ -48,6 +55,8 @@ public class MainActivity extends Activity {
 	private SeekBar seekBar;
 	private TextView song;
 	private TextView author;
+	private TextView lrc;
+	private RelativeLayout coverFlowLayout;
 	
 //	private int currentSongId;
 	
@@ -100,6 +109,15 @@ public class MainActivity extends Activity {
     	song = (TextView)findViewById(R.id.main_infosong);
     	author = (TextView)findViewById(R.id.main_infoauthor);
     	
+    	lrc = (TextView)findViewById(R.id.main_lrc);
+    	lrc.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				applyRotation(180, 90);
+			}
+		});
+    	coverFlowLayout = (RelativeLayout)findViewById(R.id.main_coverflowlayout);
+    	
     	douban = new Douban(this);
     	imageLoader = new ImageLoader(this);
     	albums = new ArrayList<Song>();
@@ -136,7 +154,7 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				if(arg2 == musicService.currentSongId){
-					//Func.toast(MainActivity.this, "123");
+					applyRotation(0, 90);
 				}
 			}
 		});
@@ -269,4 +287,49 @@ public class MainActivity extends Activity {
 		}
     	
     }
+    
+    private void applyRotation(float start, float end){
+    	final float centerX = coverFlowLayout.getWidth() / 2f;
+    	final float centerY = coverFlowLayout.getHeight() / 2f;
+    	Rotate3DAnimation rotate3dAnimation = new Rotate3DAnimation(start, end, centerX, centerY, 310f, true);
+    	rotate3dAnimation.setDuration(500);
+    	rotate3dAnimation.setFillAfter(true);
+    	rotate3dAnimation.setInterpolator(new AccelerateInterpolator());
+    	rotate3dAnimation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation arg0) {}
+			@Override
+			public void onAnimationRepeat(Animation arg0) {}
+			
+			@Override
+			public void onAnimationEnd(Animation arg0) {
+				coverFlowLayout.post(new Runnable() {
+					@Override
+					public void run() {
+						Rotate3DAnimation animation;
+						if(coverFlow.isShown()){
+							coverFlow.setVisibility(View.GONE);
+							song.setVisibility(View.GONE);
+							author.setVisibility(View.GONE);
+							lrc.setVisibility(View.VISIBLE);
+							animation = new Rotate3DAnimation(90, 180, centerX, centerY, 310f, false);
+						}else{
+							coverFlow.setVisibility(View.VISIBLE);
+							song.setVisibility(View.VISIBLE);
+							author.setVisibility(View.VISIBLE);
+							lrc.setVisibility(View.GONE);
+							animation = new Rotate3DAnimation(90, 0, centerX, centerY, 310f, false);
+						}
+						animation.setDuration(500);
+						animation.setFillAfter(true);
+						animation.setInterpolator(new DecelerateInterpolator());
+						coverFlowLayout.startAnimation(animation);
+					}
+				});
+			}
+		});
+    	coverFlowLayout.startAnimation(rotate3dAnimation);
+    }
+    
 }

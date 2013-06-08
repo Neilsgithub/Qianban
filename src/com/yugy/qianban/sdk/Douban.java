@@ -24,45 +24,52 @@ public class Douban {
 	}
 	
 	public void getCatalog(final JsonHttpResponseHandler responseHandler){
-		client.get("http://douban.fm/", new AsyncHttpResponseHandler(){
+		final JSONObject result = new JSONObject();
+		client.get("http://douban.fm/j/explore/hot_channels?start=0&limit=12", new JsonHttpResponseHandler(){
 			@Override
-			public void onSuccess(String content) {
+			public void onSuccess(int statusCode, JSONObject response) {
 				// TODO Auto-generated method stub
-				JSONObject result = new JSONObject(); 
-				Pattern hotPattern = Pattern.compile("window\\.hot_channels_json = ([^;]*)");
-				Matcher hotMatcher = hotPattern.matcher(content); 
-				Pattern fastPattern = Pattern.compile("window\\.fast_channels_json = ([^;]*)");
-				Matcher fastMatcher = fastPattern.matcher(content); 
-				Pattern comPattern = Pattern.compile("window\\.com_channels_json = ([^;]*)");
-				Matcher comMatcher = comPattern.matcher(content);
 				try {
-					if(hotMatcher.find()){
-						JSONArray jsonArray = new JSONArray(hotMatcher.group(1));
-						result.put("hot_channels", jsonArray);
-					}
-					if(fastMatcher.find()){
-						JSONArray jsonArray = new JSONArray(fastMatcher.group(1));
-						result.put("fast_channels", jsonArray);
-					}
-					if(comMatcher.find()){
-						JSONArray jsonArray = new JSONArray(comMatcher.group(1));
-						result.put("com_channels", jsonArray);
-					}
+					result.put("hot_channels", response.getJSONObject("data").getJSONArray("channels"));
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
-					//json����ʧ��
 					e.printStackTrace();
 				}
-				responseHandler.onSuccess(result);
-				super.onSuccess(content);
-			}
-			
-			@Override
-			public void onFailure(Throwable error, String content) {
-				// TODO Auto-generated method stub
-				super.onFailure(error, content);
+				super.onSuccess(statusCode, response);
 			}
 		});
+		client.get("http://douban.fm/j/explore/up_trending_channels?start=0&limit=12", new JsonHttpResponseHandler(){
+			@Override
+			public void onSuccess(int statusCode, JSONObject response) {
+				// TODO Auto-generated method stub
+				try {
+					result.put("fast_channels", response.getJSONObject("data").getJSONArray("channels"));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				super.onSuccess(statusCode, response);
+			}
+		});
+		try {
+			result.put("com_channels", new JSONArray());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while(true){
+					if(result.has("hot_channels") && result.has("fast_channels") && result.has("com_channels")){
+						responseHandler.onSuccess(result);
+						break;
+					}
+				}
+			}
+		}).start();
 	}
 	
 	public void getSongs(String id, final JsonHttpResponseHandler responseHandler){

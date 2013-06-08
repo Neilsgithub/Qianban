@@ -11,24 +11,33 @@
         android:layout_height="45dp"
         />
 
-    <com.yugy.qianban.widget.CoverFlow 
-        android:fadingEdge="none"
-        android:background="#000"
-        android:id="@+id/main_coverflow"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_below="@id/main_titlebar"
-        />
-    
     <RelativeLayout 
-        android:background="#000"
-        android:layout_below="@id/main_coverflow"
-        android:id="@+id/main_infolayout"
+        android:layout_below="@id/main_titlebar"
+        android:id="@+id/main_coverflowlayout"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="300dp"
+        android:background="#000"
         >
         
         <TextView 
+            android:id="@+id/main_lrc"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="lrc"
+            android:textColor="#FFF"
+            android:visibility="gone"
+            
+            />
+        
+        <com.yugy.qianban.widget.CoverFlow 
+	        android:fadingEdge="none"
+	        android:id="@+id/main_coverflow"
+	        android:layout_width="match_parent"
+	        android:layout_height="250dp"
+	        />
+        
+        <TextView 
+            android:layout_below="@id/main_coverflow"
             android:layout_centerHorizontal="true"
             android:id="@+id/main_infosong"
             android:layout_width="wrap_content"
@@ -56,7 +65,7 @@
         android:id="@+id/main_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/main_infolayout"
+        android:layout_below="@id/main_coverflowlayout"
         />
     
     <ImageButton 

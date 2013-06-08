@@ -1,5 +1,6 @@
 package com.yugy.qianban.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,12 +12,14 @@ import com.yugy.qianban.widget.CoverFlow;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -34,6 +37,29 @@ public class MusicService extends Service{
 	
 	public int currentSongId = 0;
 	
+	private OnPreparedListener onPreparedListener = new OnPreparedListener() {
+		
+		@Override
+		public void onPrepared(MediaPlayer mp) {
+			mediaPlayer.start();
+			seekBar.setMax(mediaPlayer.getDuration());
+			play.setImageResource(R.drawable.pause);
+		}
+	};
+	
+	private OnCompletionListener onCompletionListener = new OnCompletionListener() {
+		
+		@Override
+		public void onCompletion(MediaPlayer mp) {
+			if(currentSongId != songs.size() - 1){
+				nextSongWithoutFlip();
+				coverFlow.flipToNext();
+			}else{
+				play.setImageResource(R.drawable.play);
+			}
+		}
+	};
+	
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
@@ -47,6 +73,19 @@ public class MusicService extends Service{
 	
 	public void setPlayButton(ImageButton button){
 		play = button;
+		play.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				if(mediaPlayer.isPlaying()){
+					mediaPlayer.pause();
+					play.setImageResource(R.drawable.play);
+				}else if(mediaPlayer != null){
+					mediaPlayer.start();
+					play.setImageResource(R.drawable.pause);
+				}
+			}
+		});
 	}
 	
 	public void setSongList(ArrayList<Song> list){
@@ -62,28 +101,7 @@ public class MusicService extends Service{
 	
 	private void initMediaPlayer(){
 		mediaPlayer = new MediaPlayer();
-		mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
-			
-			@Override
-			public void onPrepared(MediaPlayer arg0) {
-				mediaPlayer.start();
-				seekBar.setMax(mediaPlayer.getDuration());
-				play.setImageResource(R.drawable.pause); 
-			}
-		});
-    	mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-			
-			@Override
-			public void onCompletion(MediaPlayer arg0) {
-				
-				if(currentSongId != songs.size() - 1){
-					nextSongWithoutFlip();
-					coverFlow.flipToNext();
-				}else{
-					play.setImageResource(R.drawable.play);
-				}
-			}
-		});
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 	}
 	
 	/**
@@ -110,12 +128,12 @@ public class MusicService extends Service{
 	
 	public void playLastSong(){
 		coverFlow.flipToPrevious();
-		lastSongWithoutFlip();
+		//lastSongWithoutFlip();
 	}
 	
 	public void playNextSong(){
 		coverFlow.flipToNext();
-		nextSongWithoutFlip();
+		//nextSongWithoutFlip();
 	}
 	
 	public void setSeekbar(final SeekBar seekBar){
@@ -163,30 +181,24 @@ public class MusicService extends Service{
 	
 	private void playSong(String url){
 		mediaPlayer.reset();
-    	mediaPlayer = MediaPlayer.create(this, Uri.parse(url));
-    	mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
-			
-			@Override
-			public void onPrepared(MediaPlayer arg0) {
-				
-				mediaPlayer.start();
-				seekBar.setMax(mediaPlayer.getDuration());
-				play.setImageResource(R.drawable.pause); 
-			}
-		});
-    	mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-			
-			@Override
-			public void onCompletion(MediaPlayer arg0) {
-				
-				if(currentSongId != songs.size() - 1){
-					nextSongWithoutFlip();
-					coverFlow.flipToNext();
-				}else{
-					play.setImageResource(R.drawable.play); 
-				}
-			}
-		});
+    	try {
+			mediaPlayer.setDataSource(url);
+			mediaPlayer.prepareAsync();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	mediaPlayer.setOnPreparedListener(onPreparedListener);
+    	mediaPlayer.setOnCompletionListener(onCompletionListener);
 	}
 	
 	@Override

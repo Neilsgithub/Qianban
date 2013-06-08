@@ -12,6 +12,7 @@
         />
 
     <RelativeLayout 
+        android:background="#000"
         android:layout_below="@id/main_titlebar"
         android:id="@+id/main_coverflowlayout"
         android:layout_width="match_parent"

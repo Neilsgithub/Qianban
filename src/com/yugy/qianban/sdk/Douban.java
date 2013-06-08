@@ -70,7 +70,7 @@ public class Douban {
 	}
 	
 	public void getSongs(String id, final JsonHttpResponseHandler responseHandler){
-		client.get("http://douban.fm/j/mine/playlist?type=n&channel=" + id + "&pb=64&from=mainsite", new JsonHttpResponseHandler(){
+		client.get("http://douban.fm/j/mine/playlist?type=n&channel=" + id, new JsonHttpResponseHandler(){
 			@Override
 			public void onSuccess(JSONObject response) {
 				// TODO Auto-generated method stub

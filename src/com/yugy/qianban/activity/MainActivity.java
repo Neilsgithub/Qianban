@@ -34,6 +34,7 @@ import android.widget.BaseAdapter;
 import android.widget.Gallery.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class MainActivity extends Activity {
 	private TextView author;
 	private TextView lrc;
 	private RelativeLayout coverFlowLayout;
+	private ProgressBar progressBar;
 	
 //	private int currentSongId;
 	
@@ -90,6 +92,7 @@ public class MainActivity extends Activity {
 				setButtonClick();
 				initCoverFlow();
 				musicService.setSeekbar(seekBar);
+				musicService.setProgressBar(progressBar);
 				getSongs(catalogId);
 			}
 		}, Context.BIND_AUTO_CREATE);
@@ -107,6 +110,8 @@ public class MainActivity extends Activity {
     	
     	song = (TextView)findViewById(R.id.main_infosong);
     	author = (TextView)findViewById(R.id.main_infoauthor);
+    	
+    	progressBar = (ProgressBar)findViewById(R.id.main_coverflowwaiting);
     	
     	lrc = (TextView)findViewById(R.id.main_lrc);
     	Rotate3DAnimation animation = new Rotate3DAnimation(0, 180, FuncInt.getScreenWidth(this) / 2, 0, 0, false);
@@ -204,6 +209,8 @@ public class MainActivity extends Activity {
 			}
 		});
 		musicService.setPlayButton(play);
+		musicService.setPreviousButton(previous);
+		musicService.setNextButton(next);
 	}
 
 	private void getCatelog(){

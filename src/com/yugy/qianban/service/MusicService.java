@@ -21,6 +21,7 @@ import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
@@ -33,14 +34,38 @@ public class MusicService extends Service{
 	private SeekBar seekBar;
 	private ArrayList<Song> songs;
 	private ImageButton play;
+	private ImageButton previous;
+	private ImageButton next;
 	private CoverFlow coverFlow;
+	private ProgressBar progressBar; 
 	
 	public int currentSongId = 0;
+	
+	public void setProgressBar(ProgressBar b){
+		progressBar = b;
+	}
+	
+	public void setPreviousButton(ImageButton a){
+		previous = a;
+	}
+	
+	public void setNextButton(ImageButton a){
+		next = a;
+	}
+	
+	private void setCoverFlowSelectable(boolean a){
+		coverFlow.setTouchable(a);
+		previous.setClickable(a);
+		next.setClickable(a);
+		play.setClickable(a);
+	}
 	
 	private OnPreparedListener onPreparedListener = new OnPreparedListener() {
 		
 		@Override
 		public void onPrepared(MediaPlayer mp) {
+			progressBar.setVisibility(View.GONE);
+			setCoverFlowSelectable(true);
 			mediaPlayer.start();
 			seekBar.setMax(mediaPlayer.getDuration());
 			play.setImageResource(R.drawable.pause);
@@ -180,6 +205,8 @@ public class MusicService extends Service{
 	
 	private void playSong(String url){
 		mediaPlayer.reset();
+		progressBar.setVisibility(View.VISIBLE);
+		setCoverFlowSelectable(false);
     	try {
 			mediaPlayer.setDataSource(url);
 			mediaPlayer.prepareAsync();

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.util.AttributeSet;
+import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +22,10 @@ public class CoverFlow extends Gallery {
 	private boolean mAlphaMode = true;
 	private boolean mCircleMode = false;
 
+	private int SWIPE_MIN_DISTANCE = 120;   
+	private int SWIPE_MAX_OFF_PATH = 250;   
+	private int SWIPE_THRESHOLD_VELOCITY = 200;
+	
 	public CoverFlow(Context context) {
 		super(context);
 		this.setStaticTransformationsEnabled(true);
@@ -97,7 +102,7 @@ public class CoverFlow extends Gallery {
 	}
 
 	/**
-	 * Õâ¾ÍÊÇËùÎ½µÄÔÚ´óÐ¡µÄ²¼¾ÖÊ±,ÕâÒ»¹ÛµãÒÑ¾­·¢ÉúÁË¸Ä±ä¡£Èç¹û ÄãÖ»ÊÇÌí¼Óµ½ÊÓÍ¼²ã´Î,ÓÐÈË½ÐÄã¾ÉµÄ¹ÛÄî ¼ÛÖµ¹ÛÎª0¡£
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î½ï¿½ï¿½ï¿½Ú´ï¿½Ð¡ï¿½Ä²ï¿½ï¿½ï¿½Ê±,ï¿½ï¿½Ò»ï¿½Ûµï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸Ä±ä¡£ï¿½ï¿½ï¿½ ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ë½ï¿½ï¿½ï¿½ÉµÄ¹ï¿½ï¿½ï¿½ ï¿½ï¿½Öµï¿½ï¿½Îª0ï¿½ï¿½
 	 * 
 	 * @param w
 	 *            Current width of this view.
@@ -114,7 +119,7 @@ public class CoverFlow extends Gallery {
 	}
 
 	/**
-	 * °ÑÍ¼ÏñÎ»Í¼µÄ½Ç¶ÈÍ¨¹ý
+	 * ï¿½ï¿½Í¼ï¿½ï¿½Î»Í¼ï¿½Ä½Ç¶ï¿½Í¨ï¿½ï¿½
 	 * 
 	 * @param imageView
 	 *            ImageView the ImageView whose bitmap we want to rotate
@@ -132,7 +137,7 @@ public class CoverFlow extends Gallery {
 		final int rotation = Math.abs(rotationAngle);
 		mCamera.translate(0.0f, 0.0f, 100.0f);
 
-		// ÈçÊÓÍ¼µÄ½Ç¶È¸üÉÙ,·Å´ó
+		// ï¿½ï¿½ï¿½ï¿½Í¼ï¿½Ä½Ç¶È¸ï¿½ï¿½ï¿½,ï¿½Å´ï¿½
 		if (rotation <= mMaxRotationAngle) {
 			float zoomAmount = (float) (mMaxZoom + (rotation * 1.5));
 			mCamera.translate(0.0f, 0.0f, zoomAmount);
@@ -154,10 +159,30 @@ public class CoverFlow extends Gallery {
 	}
 	
 	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	
+	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
 		// TODO Auto-generated method stub
-		
+		if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs
+			(velocityX) > SWIPE_THRESHOLD_VELOCITY) {   
+			flipToNext();   
+		} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && 
+		Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {   
+			flipToPrevious(); 
+		}   
+		if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && 
+		Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {  
+			flipToNext();   
+		} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && 
+		Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {  
+			flipToPrevious(); 
+		} 
 		return true;
 	}
 	
@@ -169,4 +194,14 @@ public class CoverFlow extends Gallery {
 		onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
 	}
 	
+	public void setTouchable(final boolean a){
+		setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO Auto-generated method stub
+				return !a;
+			}
+		});
+	}
 }

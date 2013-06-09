@@ -59,6 +59,15 @@
             android:textColor="#FFF"
             android:textSize="12sp"
             />
+
+        <ProgressBar
+            android:id="@+id/main_coverflowwaiting"
+            style="@android:style/Widget.ProgressBar.Large"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="85dp" />
         
     </RelativeLayout>
     

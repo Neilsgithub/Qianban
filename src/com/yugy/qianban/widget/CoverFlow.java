@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.util.AttributeSet;
-import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +22,6 @@ public class CoverFlow extends Gallery {
 	private boolean mCircleMode = false;
 
 	private int SWIPE_MIN_DISTANCE = 120;   
-	private int SWIPE_MAX_OFF_PATH = 250;   
 	private int SWIPE_THRESHOLD_VELOCITY = 200;
 	
 	public CoverFlow(Context context) {

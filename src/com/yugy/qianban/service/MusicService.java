@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.yugy.qianban.R;
+import com.yugy.qianban.activity.MainActivity.UIController;
 import com.yugy.qianban.asisClass.Func;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.widget.CoverFlow;
@@ -21,7 +22,6 @@ import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
@@ -34,38 +34,21 @@ public class MusicService extends Service{
 	private SeekBar seekBar;
 	private ArrayList<Song> songs;
 	private ImageButton play;
-	private ImageButton previous;
-	private ImageButton next;
 	private CoverFlow coverFlow;
-	private ProgressBar progressBar; 
+	private UIController controller;
 	
 	public int currentSongId = 0;
 	
-	public void setProgressBar(ProgressBar b){
-		progressBar = b;
-	}
-	
-	public void setPreviousButton(ImageButton a){
-		previous = a;
-	}
-	
-	public void setNextButton(ImageButton a){
-		next = a;
-	}
-	
-	private void setCoverFlowSelectable(boolean a){
-		coverFlow.setTouchable(a);
-		previous.setClickable(a);
-		next.setClickable(a);
-		play.setClickable(a);
+	public void setUIController(UIController c){
+		controller = c;
 	}
 	
 	private OnPreparedListener onPreparedListener = new OnPreparedListener() {
 		
 		@Override
 		public void onPrepared(MediaPlayer mp) {
-			progressBar.setVisibility(View.GONE);
-			setCoverFlowSelectable(true);
+			controller.hideProgressBar();
+			controller.setCoverFlowSelectable(true);
 			mediaPlayer.start();
 			seekBar.setMax(mediaPlayer.getDuration());
 			play.setImageResource(R.drawable.pause);
@@ -87,7 +70,6 @@ public class MusicService extends Service{
 	
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
 		initMediaPlayer();
 		super.onCreate();
 	}
@@ -152,12 +134,10 @@ public class MusicService extends Service{
 	
 	public void playLastSong(){
 		coverFlow.flipToPrevious();
-		//lastSongWithoutFlip();
 	}
 	
 	public void playNextSong(){
 		coverFlow.flipToNext();
-		//nextSongWithoutFlip();
 	}
 	
 	public void setSeekbar(final SeekBar seekBar){
@@ -166,19 +146,16 @@ public class MusicService extends Service{
 			
 			@Override
 			public void onStopTrackingTouch(SeekBar arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void onStartTrackingTouch(SeekBar arg0) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
 			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-				// TODO Auto-generated method stub
 				if(arg2){
 					mediaPlayer.seekTo(arg1);
 					if(!mediaPlayer.isPlaying()){
@@ -192,7 +169,6 @@ public class MusicService extends Service{
 			
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				if(mediaPlayer != null){
 					if(mediaPlayer.isPlaying()){
 						seekBar.setProgress(mediaPlayer.getCurrentPosition());
@@ -205,22 +181,18 @@ public class MusicService extends Service{
 	
 	private void playSong(String url){
 		mediaPlayer.reset();
-		progressBar.setVisibility(View.VISIBLE);
-		setCoverFlowSelectable(false);
+		controller.showProgressBar();
+		controller.setCoverFlowSelectable(false);
     	try {
 			mediaPlayer.setDataSource(url);
 			mediaPlayer.prepareAsync();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	mediaPlayer.setOnPreparedListener(onPreparedListener);
@@ -229,7 +201,6 @@ public class MusicService extends Service{
 	
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
 		binder = new MusicService.LocalBinder();
 		return binder;
 	}
@@ -243,7 +214,6 @@ public class MusicService extends Service{
 	
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
 		if(mediaPlayer != null){
 			mediaPlayer.release();
 		}

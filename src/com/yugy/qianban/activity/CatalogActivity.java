@@ -10,9 +10,6 @@ import org.json.JSONObject;
 import com.boqi.qianban.widget.TagsGridView;
 import com.fedorvlasov.lazylist.ImageLoader;
 import com.yugy.qianban.R;
-import com.yugy.qianban.R.drawable;
-import com.yugy.qianban.R.id;
-import com.yugy.qianban.R.layout;
 import com.yugy.qianban.asisClass.Conf;
 
 import android.app.Activity;
@@ -27,7 +24,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class CatalogActivity extends Activity{
 	

@@ -1,10 +1,36 @@
 package com.yugy.qianban.activity;
 
 import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.BaseAdapter;
+import android.widget.Gallery.LayoutParams;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.fedorvlasov.lazylist.ImageLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -17,32 +43,6 @@ import com.yugy.qianban.sdk.Douban;
 import com.yugy.qianban.service.MusicService;
 import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
-
-import android.os.Bundle;
-import android.os.IBinder;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Animation.AnimationListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.BaseAdapter;
-import android.widget.Gallery.LayoutParams;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
@@ -89,10 +89,10 @@ public class MainActivity extends Activity {
 			@Override
 			public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 				musicService = ((MusicService.LocalBinder)arg1).getService();
+				musicService.setUIController(new UIController());
 				setButtonClick();
 				initCoverFlow();
 				musicService.setSeekbar(seekBar);
-				musicService.setProgressBar(progressBar);
 				getSongs(catalogId);
 			}
 		}, Context.BIND_AUTO_CREATE);
@@ -209,8 +209,6 @@ public class MainActivity extends Activity {
 			}
 		});
 		musicService.setPlayButton(play);
-		musicService.setPreviousButton(previous);
-		musicService.setNextButton(next);
 	}
 
 	private void getCatelog(){
@@ -342,4 +340,22 @@ public class MainActivity extends Activity {
     	coverFlowLayout.startAnimation(rotate3dAnimation);
     }
     
+    public class UIController{
+    	
+    	public void showProgressBar(){
+    		progressBar.setVisibility(View.VISIBLE);
+    	}
+    	
+    	public void hideProgressBar(){
+    		progressBar.setVisibility(View.GONE);
+    	}
+    	
+    	public void setCoverFlowSelectable(boolean a){
+    		coverFlow.setTouchable(a);
+    		previous.setClickable(a);
+    		next.setClickable(a);
+    		play.setClickable(a);
+    	}
+    }
+        
 }

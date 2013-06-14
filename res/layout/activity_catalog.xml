@@ -49,6 +49,7 @@
                 android:textSize="12sp" />
 
             <com.boqi.qianban.widget.TagsGridView
+                android:layoutAnimation="@anim/navagation_gridview_anim"
                 android:listSelector="@color/transparent"
                 android:id="@+id/hot_module_catalog"
                 android:layout_width="fill_parent"

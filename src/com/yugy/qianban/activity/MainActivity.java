@@ -1,5 +1,8 @@
 package com.yugy.qianban.activity;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -33,13 +36,18 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.fedorvlasov.lazylist.ImageLoader;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.Conf;
+import com.yugy.qianban.asisClass.Func;
 import com.yugy.qianban.asisClass.FuncInt;
+import com.yugy.qianban.asisClass.LrcFormat;
+import com.yugy.qianban.asisClass.LrcProcesser;
 import com.yugy.qianban.asisClass.Rotate3DAnimation;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
+import com.yugy.qianban.sdk.GeCiMe;
 import com.yugy.qianban.service.MusicService;
 import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.Titlebar;
@@ -69,7 +77,10 @@ public class MainActivity extends Activity {
 	private AlbumAdapter albumAdapter;
 	String catalogId = "1";
 	
-    @Override
+	private String lrcUrl;         //歌词路径
+	private String lrcString;      //歌词字符串
+	private LrcFormat lrcFormat;   //转换后的歌词格式
+	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -356,6 +367,60 @@ public class MainActivity extends Activity {
     		next.setClickable(a);
     		play.setClickable(a);
     	}
+    	
+    	public void loadLrc(int i){
+    		downloadLrc(albums.get(i).title, albums.get(i).author);	
+    	}
     }
-        
+    
+    //下载并返回歌词字符串
+    public void downloadLrc(String songName, String authorName){
+		Func.log("http://geci.me/api/lyric/" + songName + "/" + authorName);
+    	songName = songName.replaceAll(" ", "%20");
+    	authorName = authorName.replaceAll(" ", "%20");
+    	songName = URLEncoder.encode(songName);
+    	authorName = URLEncoder.encode(authorName);
+    	//取第i首歌词列表（即id=i的歌词列表）,并获得列表中第一个路径
+		GeCiMe.searchLrc(songName, authorName, new JsonHttpResponseHandler(){
+			@Override
+			public void onSuccess(JSONObject response) {
+				// TODO Auto-generated method stub
+				try {
+					JSONArray result = response.getJSONArray("result");
+					if(result.length() != 0){
+						lrcUrl = response.getJSONArray("result").getJSONObject(0).getString("lrc");
+						Func.log(lrcUrl);
+						//通过歌词路径获取歌词
+						GeCiMe.downloadLrc(lrcUrl, new AsyncHttpResponseHandler(){
+							@Override
+							public void onSuccess(String content) {
+								// TODO Auto-generated method stub
+								lrcString = content;
+								changeFormat();
+								super.onSuccess(content);
+							}
+						});
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				super.onSuccess(response);
+			}
+		});
+    }   
+    
+    //将歌词字符串转换成LrcFormat
+    public void changeFormat(){
+    	LrcProcesser pro = new LrcProcesser();
+    	try {
+			lrcFormat = pro.process(new ByteArrayInputStream(lrcString.getBytes("UTF-8")));
+			for(int i = 0; i < lrcFormat.getIndex(); i ++){
+				Func.log(lrcFormat.getTime(i) + "  " + lrcFormat.getLrc(i));
+			}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 }

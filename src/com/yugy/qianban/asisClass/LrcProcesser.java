@@ -1,5 +1,6 @@
 package com.yugy.qianban.asisClass;
 
+import android.annotation.SuppressLint;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,11 +9,12 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressLint("UseSparseArrays")
 public class LrcProcesser {
 
-	public HashMap<Integer, String> process (InputStream inputStream){
+	public LrcFormat process (InputStream inputStream){
 		String currentLine;
-		HashMap<Integer, String> lrc = new HashMap<Integer, String>();
+		LrcFormat lrcList = new LrcFormat();
 		HashMap<Integer, String> lrcMess = new HashMap<Integer, String>();
 		InputStreamReader inputReader = new InputStreamReader(inputStream);
 		BufferedReader bufferedReader = new BufferedReader(inputReader);
@@ -23,8 +25,8 @@ public class LrcProcesser {
 		int count = 0;
 		try {
 			while ((currentLine = bufferedReader.readLine()) != null){
-				Matcher m = lrcPattern.matcher(currentLine);
-				lrcStr = currentLine.replaceAll("\\[([0-9][^\\]]+)\\]", "");
+				Matcher m = lrcPattern.matcher(currentLine);                   //匹配当前行
+				lrcStr = currentLine.replaceAll("\\[([0-9][^\\]]+)\\]", "");   //将当前行中的所有时间格式替换成""
 				while (m.find()){
 					timeStr = m.group();
 					time2ms[count] = time2ms(timeStr.substring(1, timeStr.length() - 1));
@@ -38,9 +40,9 @@ public class LrcProcesser {
 		}
 		sort(time2ms);
 		for(int i = 0; i < count; i ++){
-			lrc.put(time2ms[i], lrcMess.get(time2ms[i]));
+			lrcList.add(time2ms[i], lrcMess.get(time2ms[i]));
 		}
-		return lrc;
+		return lrcList;
 	}
 	
 	public void sort(int[] a){

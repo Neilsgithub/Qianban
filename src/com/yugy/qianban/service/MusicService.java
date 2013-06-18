@@ -180,6 +180,7 @@ public class MusicService extends Service{
 	}
 	
 	private void playSong(String url){
+		controller.loadLrc(currentSongId);
 		mediaPlayer.reset();
 		controller.showProgressBar();
 		controller.setCoverFlowSelectable(false);

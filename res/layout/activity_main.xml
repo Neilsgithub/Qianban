@@ -19,15 +19,12 @@
         android:layout_height="300dp"
         >
         
-        <TextView 
+        <com.yugy.qianban.widget.LrcView
             android:background="#000"
             android:id="@+id/main_lrc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="abcdefghijk"
-            android:textColor="#FFF"
             android:visibility="gone"
-            
             />
         
         <com.yugy.qianban.widget.CoverFlow 

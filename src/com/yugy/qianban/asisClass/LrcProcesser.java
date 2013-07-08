@@ -40,6 +40,7 @@ public class LrcProcesser {
 		}
 		sort(time2ms);
 		for(int i = 0; i < count; i ++){
+			//lrcList.add(time2ms[i], new String(lrcMess.get(time2ms[i]).getBytes("GBK"), "unicode"));
 			lrcList.add(time2ms[i], lrcMess.get(time2ms[i]));
 		}
 		return lrcList;

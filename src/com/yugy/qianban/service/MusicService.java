@@ -213,6 +213,14 @@ public class MusicService extends Service{
 		}
 	}
 	
+	public void seekTo(int time){
+		mediaPlayer.seekTo(time);
+	}
+	
+	public boolean isPlaying(){
+		return mediaPlayer.isPlaying();
+	}
+	
 	@Override
 	public void onDestroy() {
 		if(mediaPlayer != null){

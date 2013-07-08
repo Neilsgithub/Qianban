@@ -47,15 +47,42 @@ public class LrcFormat {
 		return index;
 	}
 	
-	//未完
-	public long getIndexFromTime(long time){
+	public void clear(){
+		timelist.clear();
+		lrclist.clear();
+		index = -1;
+	}
+	
+	//待测
+	public int getCurrentIndexFromTime(long time){
 		int currentIndex = 0;
 		if(index <= -1){
 			return -1;
 		}
 		while(true){
-			if(time > getTime(currentIndex))
-			return (long)currentIndex;
+			if(time >= getTime(currentIndex)){
+				if(currentIndex < index){
+					currentIndex ++;
+				}
+				else
+					return currentIndex;
+			}
+			else if (time < getTime(currentIndex)) {
+				if(currentIndex == 0){
+					return -2;
+				}
+				else
+					return currentIndex - 1;
+			}
 		}
+	}
+	
+	//待测
+	public long getSleeptimeFromIndex(int index){
+		if(index == this.index){
+			return 900;
+		}
+		else
+			return getTime(index + 1) - getTime(index);
 	}
 }

@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -47,9 +50,10 @@ import com.yugy.qianban.asisClass.LrcProcesser;
 import com.yugy.qianban.asisClass.Rotate3DAnimation;
 import com.yugy.qianban.asisClass.Song;
 import com.yugy.qianban.sdk.Douban;
-import com.yugy.qianban.sdk.GeCiMe;
+import com.yugy.qianban.sdk.LRC;
 import com.yugy.qianban.service.MusicService;
 import com.yugy.qianban.widget.CoverFlow;
+import com.yugy.qianban.widget.LrcView;
 import com.yugy.qianban.widget.Titlebar;
 
 @SuppressWarnings("deprecation")
@@ -63,7 +67,7 @@ public class MainActivity extends Activity {
 	private SeekBar seekBar;
 	private TextView song;
 	private TextView author;
-	private TextView lrc;
+	private LrcView lrc;
 	private RelativeLayout coverFlowLayout;
 	private ProgressBar progressBar;
 	
@@ -80,6 +84,8 @@ public class MainActivity extends Activity {
 	private String lrcUrl;         //歌词路径
 	private String lrcString;      //歌词字符串
 	private LrcFormat lrcFormat;   //转换后的歌词格式
+	//private Thread thread = new Thread();
+	private UIUpdateThread thread;
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +130,7 @@ public class MainActivity extends Activity {
     	
     	progressBar = (ProgressBar)findViewById(R.id.main_coverflowwaiting);
     	
-    	lrc = (TextView)findViewById(R.id.main_lrc);
+    	lrc = (LrcView)findViewById(R.id.main_lrc);
     	Rotate3DAnimation animation = new Rotate3DAnimation(0, 180, FuncInt.getScreenWidth(this) / 2, 0, 0, false);
     	animation.setDuration(0);
     	animation.setFillAfter(true);
@@ -135,6 +141,7 @@ public class MainActivity extends Activity {
 				applyRotation(180, 90);
 			}
 		});
+    	
     	coverFlowLayout = (RelativeLayout)findViewById(R.id.main_coverflowlayout);
     	
     	douban = new Douban(this);
@@ -143,6 +150,8 @@ public class MainActivity extends Activity {
     	albumAdapter = new AlbumAdapter();
     	
     	seekBar = (SeekBar)findViewById(R.id.main_seekbar);
+    	
+    	thread  = new UIUpdateThread();
     }
     
     private void initCoverFlow(){
@@ -155,8 +164,18 @@ public class MainActivity extends Activity {
 				song.setText(albums.get(arg2).title);
 				author.setText(albums.get(arg2).author + " - " + albums.get(arg2).albumName);
 				if(arg2 > musicService.currentSongId){
+					if(thread.isAlive()){
+						thread.stopThread(true);
+						thread.interrupt();
+					}
+					lrc.clear();
 					musicService.nextSongWithoutFlip();
 				}else if(arg2 < musicService.currentSongId){
+					if(thread.isAlive()){
+						thread.stopThread(true);
+						thread.interrupt();
+					}
+					lrc.clear();
 					musicService.lastSongWithoutFlip();
 				}
 			}
@@ -254,6 +273,11 @@ public class MainActivity extends Activity {
     			coverFlow.setSelection(0);
     			MainActivity.this.song.setText(albums.get(0).title);
 				author.setText(albums.get(0).author + " - " + albums.get(0).albumName);
+				if(thread.isAlive()){
+					thread.stopThread(true);
+					thread.interrupt();
+				}
+				lrc.clear();
 				musicService.setSongList(albums);
     			super.onSuccess(response);
     		}
@@ -367,7 +391,7 @@ public class MainActivity extends Activity {
     		next.setClickable(a);
     		play.setClickable(a);
     	}
-    	
+    	 
     	public void loadLrc(int i){
     		downloadLrc(albums.get(i).title, albums.get(i).author);	
     	}
@@ -375,35 +399,31 @@ public class MainActivity extends Activity {
     
     //下载并返回歌词字符串
     public void downloadLrc(String songName, String authorName){
-		Func.log("http://geci.me/api/lyric/" + songName + "/" + authorName);
+		Func.log("http://box.zhangmen.baidu.com/x?op=12&count=1&title=" + songName + "$$" + authorName + "$$$$");
     	songName = songName.replaceAll(" ", "%20");
     	authorName = authorName.replaceAll(" ", "%20");
     	songName = URLEncoder.encode(songName);
     	authorName = URLEncoder.encode(authorName);
     	//取第i首歌词列表（即id=i的歌词列表）,并获得列表中第一个路径
-		GeCiMe.searchLrc(songName, authorName, new JsonHttpResponseHandler(){
+		LRC.searchLrc(songName, authorName, new AsyncHttpResponseHandler(){
 			@Override
-			public void onSuccess(JSONObject response) {
-				// TODO Auto-generated method stub
-				try {
-					JSONArray result = response.getJSONArray("result");
-					if(result.length() != 0){
-						lrcUrl = response.getJSONArray("result").getJSONObject(0).getString("lrc");
-						Func.log(lrcUrl);
-						//通过歌词路径获取歌词
-						GeCiMe.downloadLrc(lrcUrl, new AsyncHttpResponseHandler(){
-							@Override
-							public void onSuccess(String content) {
-								// TODO Auto-generated method stub
-								lrcString = content;
-								changeFormat();
-								super.onSuccess(content);
-							}
-						});
-					}
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			public void onSuccess(String response) {
+				Pattern p = Pattern.compile("<lrcid>([0-9]+)</lrcid>");
+				Matcher m = p.matcher(response);
+				if(m.find()){
+					lrcUrl = m.group();
+					lrcUrl = lrcUrl.substring(7, lrcUrl.length() - 8);
+					lrcUrl = "http://box.zhangmen.baidu.com/bdlrc/" + Integer.parseInt(lrcUrl)/100 +"/" + Integer.parseInt(lrcUrl) + ".lrc";
+					Func.log(lrcUrl);
+					//通过歌词路径获取歌词
+					LRC.downloadLrc(lrcUrl, new AsyncHttpResponseHandler(){
+						@Override
+						public void onSuccess(String content) {
+							lrcString = content;
+							changeFormat();
+							super.onSuccess(content);
+						}
+					});
 				}
 				super.onSuccess(response);
 			}
@@ -415,12 +435,72 @@ public class MainActivity extends Activity {
     	LrcProcesser pro = new LrcProcesser();
     	try {
 			lrcFormat = pro.process(new ByteArrayInputStream(lrcString.getBytes("UTF-8")));
+			lrc.setLrc(lrcFormat);
+			Func.log(lrc.getIndex() + "");
+			thread = new UIUpdateThread();
+			thread.start();
+			/*thread =  new Thread(new UIUpdateThread());
+			thread.start();*/
 			for(int i = 0; i < lrcFormat.getIndex(); i ++){
-				Func.log(lrcFormat.getTime(i) + "  " + lrcFormat.getLrc(i));
+				Func.log(lrcFormat.getTime(i)/60000 + ":" + lrcFormat.getTime(i)%60000/1000 + "  " + lrcFormat.getLrc(i));
 			}
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
+    
+    /*class UIUpdateThread implements Runnable {  
+        long time = 1; // 开始 的时间，不能为零，否则前面几句歌词没有显示出来  
+        public void run() {  
+        	while (true){
+        		if(musicService.isPlaying())
+        			break;
+        	}
+            while (musicService.isPlaying()) {  
+                long sleeptime = lrc.updateIndexReturnSleeptime(time);  
+                time += sleeptime;  
+                mHandler.post(mUpdateResults);  
+                if (sleeptime == -1)  
+                    return;  
+                try {  
+                    Thread.sleep(sleeptime);  
+                } catch (InterruptedException e) {  
+                    e.printStackTrace();  
+                }  
+            }  
+        }  
+    }  */
+    
+    class UIUpdateThread extends Thread{  
+        long time = 1; // 开始 的时间，不能为零，否则前面几句歌词没有显示出来  
+        boolean _run = true;
+        public void stopThread(boolean run){
+        	_run = !run;
+        }
+        public void run() {  
+        	while (true){
+        		if(musicService.isPlaying())
+        			break;
+        	}
+            while (musicService.isPlaying() && _run) {  
+                long sleeptime = lrc.updateIndexReturnSleeptime(time);  
+                time += sleeptime;  
+                mHandler.post(mUpdateResults);  
+                if (sleeptime == -1)  
+                    return;  
+                try {  
+                    Thread.sleep(sleeptime);  
+                } catch (InterruptedException e) {  
+                    e.printStackTrace();  
+                }  
+            }  
+        }  
+    }  
+    
+    Handler mHandler = new Handler();  
+    Runnable mUpdateResults = new Runnable() {  
+        public void run() {  
+            lrc.invalidate(); // 更新视图  
+        }  
+    };  
 }

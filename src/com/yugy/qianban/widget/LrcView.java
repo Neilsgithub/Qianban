@@ -7,17 +7,21 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.widget.ScrollView;
+import android.view.View;
+import android.view.ViewGroup;
 
-public class LrcView extends ScrollView{
+public class LrcView extends View{
 	
 	private Paint mPaint;   //播放前和播放后歌词
 	private Paint sPaint;   //正在播放歌词
 	private float mX;
 	private float middleY; //Y轴中心
+	private float mY;      //暂存Y轴中心
+	private float currentPlayY;  //高亮部分的当前Y轴位置
 	private static int DY = 35; //每行间隔
-	public int index = 0;
+	public int index = -1;
 	private LrcFormat lrcFormat;
+	private float scrollH;
 	
 	public LrcView(Context context) {
 		super(context);
@@ -35,7 +39,7 @@ public class LrcView extends ScrollView{
 	}
 	
 	private void init(){
-		setFocusable(true);
+		middleY = mY;
 		
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
@@ -49,6 +53,9 @@ public class LrcView extends ScrollView{
 		sPaint.setTextSize(25);
 		sPaint.setColor(Color.WHITE);
 		sPaint.setTypeface(Typeface.SERIF);
+		
+		lrcFormat = new LrcFormat();
+		lrcFormat.add(0, "歌词显示");
 	}
 	
 	protected void onDraw(Canvas canvas) {
@@ -60,28 +67,72 @@ public class LrcView extends ScrollView{
 			return;
 		}
 		sp.setTextAlign(Paint.Align.CENTER);
-		//先画出正在播放部分
-		canvas.drawText(lrcFormat.getLrc(index), mX, middleY, sp);
-		float tempY = middleY;
-		//画出本句之前的句子
-		for(int i = index - 1; i >= 0; i --){
-			tempY = tempY - DY;
-			canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
+		if(index == 0){
+			//先画出正在播放部分
+			canvas.drawText(lrcFormat.getLrc(index), mX, mY, sp);
+			float tempY = mY;
+			//画出本句之前的句子
+			for(int i = index - 1; i >= 0; i --){
+				tempY = tempY - DY;
+				canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
+			}
+			tempY = mY;
+			//画出本句之后的句子
+			for(int i = index + 1; i < lrcFormat.getIndex(); i ++){
+				tempY = tempY + DY;
+				canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
+			}
+			currentPlayY = mY;
 		}
-		tempY = middleY;
-		//画出本句之后的句子
-		for(int i = index + 1; i < lrcFormat.getIndex(); i ++){
-			tempY = tempY + DY;
-			canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
+		else if (index > 0) {
+			canvas.drawText(lrcFormat.getLrc(index), mX, currentPlayY, sp);
+			float tempY = currentPlayY;
+			for(int i = index - 1; i >= 0; i --){
+				tempY = tempY - DY;
+				canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
+			}
+			tempY = currentPlayY;
+			for(int i = index + 1; i < lrcFormat.getIndex(); i ++){
+				tempY = tempY + DY;
+				canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
+			}
 		}
+		
 	}
 	protected void onSizeChanged(int w, int h, int ow, int oh){
 		super.onSizeChanged(w, h, ow, oh);
 		mX = w * 0.5f;
-		middleY = h * 0.5f;
+		mY = h * 0.5f;
 	}
 	
 	public void setLrc(LrcFormat lrc){
 		lrcFormat = lrc;
+		scrollH = middleY + (lrcFormat.getIndex() + 1) * DY;
+		ViewGroup.LayoutParams scrollHeight = getLayoutParams();
+		scrollHeight.height = (int)scrollH;
+		index = 0;
+		invalidate();
+	}
+	
+	public long updateIndexReturnSleeptime(long time){
+		index = lrcFormat.getCurrentIndexFromTime(time);
+		if(index == -1)
+			return -1;
+		else if(index == -2){
+			return lrcFormat.getTime(0);
+		}
+		else
+			return lrcFormat.getSleeptimeFromIndex(index);
+	}
+	
+	public void clear(){   //清空当前歌词
+		lrcFormat.clear();
+		lrcFormat.add(0, "歌词显示");
+		index = 0;
+		invalidate();
+	}
+	
+	public int getIndex(){
+		return lrcFormat.getIndex();
 	}
 }

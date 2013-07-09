@@ -22,7 +22,7 @@ public class Douban {
 	
 	public void getCatalog(final JsonHttpResponseHandler responseHandler){
 		final JSONObject result = new JSONObject();
-		client.get("http://douban.fm/j/explore/hot_channels?start=0&limit=12", new JsonHttpResponseHandler(){
+		client.get("http://douban.fm/j/explore/hot_channels?start=0&limit=20", new JsonHttpResponseHandler(){
 			@Override
 			public void onSuccess(int statusCode, JSONObject response) {
 				// TODO Auto-generated method stub

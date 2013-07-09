@@ -59,7 +59,7 @@
                 android:columnWidth="80dp"
                 android:numColumns="4" />
 
-            <TextView
+            <!-- <TextView
                 android:id="@+id/fast_module"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
                 android:layout_below="@id/com_module"
                 android:background="#FFF"
                 android:columnWidth="80dp"
-                android:numColumns="4" />
+                android:numColumns="4" /> -->
         </RelativeLayout>
     </ScrollView>
 

@@ -100,8 +100,8 @@ public class CatalogActivity extends Activity{
 			}
 		}
 		init(hot_names, hot_Picture_Uri, R.id.hot_module_catalog, hot_channels);
-		init(fast_names, fast_Picture_Uri, R.id.fast_module_catalog, fast_channels);
-		init(com_names, com_Picture_Uri, R.id.com_module_catalog, com_channels);
+		//init(fast_names, fast_Picture_Uri, R.id.fast_module_catalog, fast_channels);
+		//init(com_names, com_Picture_Uri, R.id.com_module_catalog, com_channels);
 	}
 	
 	private void init(String[] names, String[] Uri, int gridId, final JSONArray module){

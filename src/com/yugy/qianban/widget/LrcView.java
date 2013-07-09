@@ -1,5 +1,6 @@
 package com.yugy.qianban.widget;
 
+import com.yugy.qianban.asisClass.FuncInt;
 import com.yugy.qianban.asisClass.LrcFormat;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,20 +9,17 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 
 public class LrcView extends View{
 	
 	private Paint mPaint;   //播放前和播放后歌词
 	private Paint sPaint;   //正在播放歌词
-	private float mX;
-	private float middleY; //Y轴中心
+	private float mX;		//暂存X轴中心
 	private float mY;      //暂存Y轴中心
 	private float currentPlayY;  //高亮部分的当前Y轴位置
-	private static int DY = 35; //每行间隔
+	private static int DY; //每行间隔
 	public int index = -1;
 	private LrcFormat lrcFormat;
-	private float scrollH;
 	
 	public LrcView(Context context) {
 		super(context);
@@ -39,7 +37,7 @@ public class LrcView extends View{
 	}
 	
 	private void init(){
-		middleY = mY;
+		DY = FuncInt.dp(getContext(), 35);
 		
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
@@ -61,7 +59,7 @@ public class LrcView extends View{
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		Paint mp = mPaint;
-		Paint sp = sPaint;
+		Paint sp = sPaint; 
 		mp.setTextAlign(Paint.Align.CENTER);
 		if(lrcFormat.getIndex() == -1){
 			return;
@@ -97,7 +95,6 @@ public class LrcView extends View{
 				canvas.drawText(lrcFormat.getLrc(i), mX, tempY, mp);
 			}
 		}
-		
 	}
 	protected void onSizeChanged(int w, int h, int ow, int oh){
 		super.onSizeChanged(w, h, ow, oh);
@@ -107,9 +104,6 @@ public class LrcView extends View{
 	
 	public void setLrc(LrcFormat lrc){
 		lrcFormat = lrc;
-		scrollH = middleY + (lrcFormat.getIndex() + 1) * DY;
-		ViewGroup.LayoutParams scrollHeight = getLayoutParams();
-		scrollHeight.height = (int)scrollH;
 		index = 0;
 		invalidate();
 	}

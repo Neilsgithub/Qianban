@@ -54,7 +54,7 @@ public class CatalogActivity extends Activity{
 	}
 	
 	private void setCatalog(JSONObject catalog){
-		imageLoader = new ImageLoader(this);
+		imageLoader = new ImageLoader(this, "qianban/cache", getResources().getDrawable(R.drawable.stub));
 		JSONArray hot_channels = new JSONArray();
 		JSONArray fast_channels = new JSONArray();
 		JSONArray com_channels = new JSONArray();

@@ -15,6 +15,7 @@ public class Rotate3DAnimation extends Animation{
 	private float depthZ;
 	
 	private boolean reverse;
+	private boolean flip;
 	
 	private Camera camera;
 	
@@ -27,13 +28,15 @@ public class Rotate3DAnimation extends Animation{
 	 * @param depthZ
 	 * @param reverse
 	 */
-	public Rotate3DAnimation(float from, float to, float x, float y, float z, boolean r){
+	public Rotate3DAnimation(float from, float to, float x, float y,
+			float z, boolean r, boolean f){
 		fromDegree = from;
 		toDegree = to;
 		centerX = x;
 		centerY = y;
 		depthZ = z;
 		reverse = r;
+		flip = f;
 	}
 	
 	@Override
@@ -47,6 +50,9 @@ public class Rotate3DAnimation extends Animation{
 	protected void applyTransformation(float interpolatedTime, Transformation t) {
 		float from = fromDegree;
 		float degree = from + (toDegree - from) * interpolatedTime;
+		if(flip){
+			degree = 180 - degree;
+		}
 		float x = centerX;
 		float y = centerY;
 		Camera c = camera;

@@ -341,7 +341,7 @@ public class MainActivity extends Activity {
 		final float centerX = coverFlowLayout.getWidth() / 2f;
 		final float centerY = coverFlowLayout.getHeight() / 2f;
 		Rotate3DAnimation rotate3dAnimation = new Rotate3DAnimation(start, end,
-				centerX, centerY, 310f, true);
+				centerX, centerY, 310f, true, false);
 		rotate3dAnimation.setDuration(500);
 		rotate3dAnimation.setFillAfter(true);
 		rotate3dAnimation.setInterpolator(new AccelerateInterpolator());
@@ -367,14 +367,14 @@ public class MainActivity extends Activity {
 							author.setVisibility(View.GONE);
 							lrc.setVisibility(View.VISIBLE);
 							animation = new Rotate3DAnimation(90, 180, centerX,
-									centerY, 310f, false);
+									centerY, 310f, false, true);
 						} else {
 							coverFlow.setVisibility(View.VISIBLE);
 							song.setVisibility(View.VISIBLE);
 							author.setVisibility(View.VISIBLE);
 							lrc.setVisibility(View.GONE);
 							animation = new Rotate3DAnimation(90, 0, centerX,
-									centerY, 310f, false);
+									centerY, 310f, false, false);
 						}
 						animation.setDuration(500);
 						animation.setFillAfter(true);

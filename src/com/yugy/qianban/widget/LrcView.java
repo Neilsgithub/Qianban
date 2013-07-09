@@ -37,18 +37,18 @@ public class LrcView extends View{
 	}
 	
 	private void init(){
-		DY = FuncInt.dp(getContext(), 35);
+		DY = FuncInt.dp(getContext(), 25);
 		
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
-		mPaint.setTextSize(25);
+		mPaint.setTextSize(FuncInt.dp(getContext(), 16));
 		mPaint.setColor(Color.WHITE);
 		mPaint.setTypeface(Typeface.SERIF);
 		mPaint.setAlpha(100);
 		
 		sPaint = new Paint();
 		sPaint.setAntiAlias(true);
-		sPaint.setTextSize(25);
+		sPaint.setTextSize(FuncInt.dp(getContext(), 16));
 		sPaint.setColor(Color.WHITE);
 		sPaint.setTypeface(Typeface.SERIF);
 		

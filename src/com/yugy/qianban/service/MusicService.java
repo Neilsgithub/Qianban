@@ -78,6 +78,15 @@ public class MusicService extends Service{
 		coverFlow = c;
 	}
 	
+	public int getDuration(){
+		if(mediaPlayer != null){
+			return mediaPlayer.getCurrentPosition();
+		}else{
+			return 0;
+		}
+		
+	}
+	
 	public void setPlayButton(ImageButton button){
 		play = button;
 		play.setOnClickListener(new OnClickListener() {

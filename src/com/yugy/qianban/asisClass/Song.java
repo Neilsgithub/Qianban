@@ -10,9 +10,11 @@ public class Song {
 	public String author;
 	public String albumName;
 	public String title;
+	public int sid;
 	
 	public void parse(JSONObject json){
 		try {
+			sid = json.getInt("sid");
 			albumCoverUrl = json.getString("picture");
 			if(albumCoverUrl.contains("mpic")){
 				albumCoverUrl = albumCoverUrl.replace("mpic", "lpic");

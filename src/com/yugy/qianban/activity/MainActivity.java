@@ -19,6 +19,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -218,14 +219,22 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) {
 
 				if (catelog != null) {
-					Intent intent = new Intent(MainActivity.this,
+					Intent intent = new Intent(MainActivity.this,   
 							CatalogActivity.class);
 					intent.putExtra("json", catelog.toString());
 					startActivityForResult(intent, Conf.REQUEST_CATALOG_CODE);
 				}
 			}
 		});
-
+		titlebar.setRightClick(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+				startActivity(intent);
+			}  
+		});
 		previous.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -407,6 +416,29 @@ public class MainActivity extends Activity {
 		public void loadLrc(int i) {
 			downloadLrc(albums.get(i).title, albums.get(i).author);
 		}
+
+		public void getNextSongs(int sid) {
+			// TODO Auto-generated method stub
+			douban.getNextSongs(catalogId, sid, new JsonHttpResponseHandler(){
+				@Override
+				public void onSuccess(JSONArray response) {
+					// TODO Auto-generated method stub
+					Song song;
+					for (int i = 0; i < response.length(); i++) {
+						song = new Song();
+						try {
+							song.parse(response.getJSONObject(i));
+							albums.add(song);
+						} catch (JSONException e) {
+
+							e.printStackTrace();
+						}
+					}
+					albumAdapter.notifyDataSetChanged();
+					super.onSuccess(response);
+				}
+			});
+		}
 	}
 
 	// 下载并返回歌词字符串
@@ -503,6 +535,17 @@ public class MainActivity extends Activity {
 		public void run() {
 			lrc.invalidate(); // 更新视图
 		}
+	};
+	
+	public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_BACK){
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
+			intent.addCategory(Intent.CATEGORY_HOME);
+			startActivity(intent);
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
 	};
 
 	@Override

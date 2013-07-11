@@ -50,7 +50,7 @@ public class Rotate3DAnimation extends Animation{
 	protected void applyTransformation(float interpolatedTime, Transformation t) {
 		float from = fromDegree;
 		float degree = from + (toDegree - from) * interpolatedTime;
-		if(flip){
+		if(flip && interpolatedTime > 0.3f){
 			degree = 180 - degree;
 		}
 		float x = centerX;

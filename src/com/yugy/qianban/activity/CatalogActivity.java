@@ -7,10 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.boqi.qianban.widget.TagsGridView;
 import com.fedorvlasov.lazylist.ImageLoader;
 import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.Conf;
+import com.yugy.qianban.widget.TagsGridView;
 
 import android.app.Activity;
 import android.content.Context;

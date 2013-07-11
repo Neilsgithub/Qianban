@@ -27,7 +27,7 @@
                 android:textColor="#000"
                 android:textSize="12sp" />
 
-            <com.boqi.qianban.widget.TagsGridView
+            <com.yugy.qianban.widget.TagsGridView
                 android:id="@+id/private_broadcast_catalog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                 android:textColor="#000"
                 android:textSize="12sp" />
 
-            <com.boqi.qianban.widget.TagsGridView
+            <com.yugy.qianban.widget.TagsGridView
                 android:layoutAnimation="@anim/navagation_gridview_anim"
                 android:listSelector="@color/transparent"
                 android:id="@+id/hot_module_catalog"

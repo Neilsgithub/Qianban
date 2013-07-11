@@ -8,8 +8,11 @@
     <string name="hot_module">热门兆赫</string>
     <string name="fast_module">上升最快</string>
     <string name="com_module">品牌兆赫</string>
-    
+
     <color name="transparent">#00FFFFFF</color>
     <color name="CCC">#CCC</color>
+
+    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_account">AccountActivity</string>
 
 </resources>

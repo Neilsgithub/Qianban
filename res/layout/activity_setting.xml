@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingActivity" >
+
+    <TextView 
+        android:id="@+id/setting_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="登陆"
+        android:textSize="20sp"
+        android:background="@drawable/titlebar_button_background"
+        />
+    
+    <View android:id="@+id/setting_line1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC"
+        android:layout_below="@id/setting_login"
+        />
+    
+    <TextView 
+        android:layout_below="@id/setting_line1"
+        android:id="@+id/setting_cache"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="缓存"
+        android:textSize="20sp"
+        android:background="@drawable/titlebar_button_background"
+        />
+    
+    <View android:id="@+id/setting_line2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC"
+        android:layout_below="@id/setting_cache"
+        />
+    
+    <TextView 
+        android:layout_below="@id/setting_line2"
+        android:id="@+id/setting_exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="退出"
+        android:textSize="20sp"
+        android:background="@drawable/titlebar_button_background"
+        />
+    
+    <View android:id="@+id/setting_line3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCC"
+        android:layout_below="@id/setting_exit"
+        />
+    
+</RelativeLayout>

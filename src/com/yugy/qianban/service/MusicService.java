@@ -136,6 +136,9 @@ public class MusicService extends Service{
 	public void nextSongWithoutFlip(){
 		if(currentSongId != songs.size() - 1){
 			currentSongId++;
+			if(currentSongId == songs.size() - 2){
+				controller.getNextSongs(songs.get(songs.size() - 1).sid);
+			}
 			playSong(songs.get(currentSongId).songUrl);
 			Func.log("Start to cache " + songs.get(currentSongId).songUrl);
     	}

@@ -1,7 +1,11 @@
 package com.yugy.qianban.activity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.security.auth.PrivateCredentialPermission;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +14,10 @@ import org.json.JSONObject;
 import com.fedorvlasov.lazylist.ImageLoader;
 import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.Conf;
+import com.yugy.qianban.database.Account;
+import com.yugy.qianban.database.DatabaseManager;
 import com.yugy.qianban.widget.TagsGridView;
+import com.yugy.qianban.widget.Titlebar;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,17 +30,15 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class CatalogActivity extends Activity{
 	
 	private String[] hot_names;
-	private String[] fast_names;
-	private String[] com_names;
 	private ImageLoader imageLoader;
 	private String[] hot_Picture_Uri;
-	private String[] fast_Picture_Uri;
-	private String[] com_Picture_Uri;
+	private DatabaseManager databaseManager;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,23 +56,39 @@ public class CatalogActivity extends Activity{
 			e.printStackTrace();
 		}
 		setCatalog(catalogObject);
+		
+		databaseManager = new DatabaseManager(this);
+		Account account = databaseManager.getAccount();
+		if(account == null){//没登陆
+			unLogging();
+		}else {
+			logging();
+		}
+	}
+	
+	private void unLogging(){
+		String[] titles = {"登陆"};
+		int[] images = {R.drawable.logging};
+		TagsGridView gridView = (TagsGridView)findViewById(R.id.private_broadcast_catalog);
+		PersonalPictureAdapter adapter = new PersonalPictureAdapter(titles, images, this);
+		gridView.setAdapter(adapter);
+	}
+	
+	private void logging(){
+		String[] titles = {"私人", "红心"};
+		int[] images = {R.drawable.personal, R.drawable.like};
+		TagsGridView gridView = (TagsGridView)findViewById(R.id.private_broadcast_catalog);
+		PersonalPictureAdapter adapter = new PersonalPictureAdapter(titles, images, this);
+		gridView.setAdapter(adapter);
 	}
 	
 	private void setCatalog(JSONObject catalog){
 		imageLoader = new ImageLoader(this, "qianban/cache", getResources().getDrawable(R.drawable.stub));
 		JSONArray hot_channels = new JSONArray();
-		JSONArray fast_channels = new JSONArray();
-		JSONArray com_channels = new JSONArray();
 		try {
 			hot_channels = catalog.getJSONArray("hot_channels");
-			fast_channels = catalog.getJSONArray("fast_channels");
-			com_channels = catalog.getJSONArray("com_channels");
 			hot_names = new String[hot_channels.length()];
-			fast_names = new String[fast_channels.length()];
-			com_names = new String[com_channels.length()];
 			hot_Picture_Uri = new String[hot_channels.length()];
-			fast_Picture_Uri = new String[fast_channels.length()];
-			com_Picture_Uri = new String[com_channels.length()];
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,27 +102,7 @@ public class CatalogActivity extends Activity{
 				e.printStackTrace();
 			}
 		}
-		for(int i = 0; i < fast_channels.length(); i ++){
-			try {
-				fast_names[i] = fast_channels.getJSONObject(i).getString("name") + "MHz";
-				fast_Picture_Uri[i] = fast_channels.getJSONObject(i).getString("cover");
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		for(int i = 0; i < com_channels.length(); i ++){
-			try {
-				com_names[i] = com_channels.getJSONObject(i).getString("name") + "MHz";
-				com_Picture_Uri[i] = com_channels.getJSONObject(i).getString("cover");
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 		init(hot_names, hot_Picture_Uri, R.id.hot_module_catalog, hot_channels);
-		//init(fast_names, fast_Picture_Uri, R.id.fast_module_catalog, fast_channels);
-		//init(com_names, com_Picture_Uri, R.id.com_module_catalog, com_channels);
 	}
 	
 	private void init(String[] names, String[] Uri, int gridId, final JSONArray module){
@@ -185,6 +186,69 @@ class PictureAdapter extends BaseAdapter {
 
 }
 
+//自定义适配器 
+class PersonalPictureAdapter extends BaseAdapter{ 
+    private LayoutInflater inflater; 
+    private List<PersonalPicture> pictures; 
+ 
+    public PersonalPictureAdapter(String[] titles, int[] images, Context context) 
+    { 
+        super(); 
+        pictures = new ArrayList<PersonalPicture>(); 
+        inflater = LayoutInflater.from(context); 
+        for (int i = 0; i < images.length; i++) 
+        { 
+            PersonalPicture picture = new PersonalPicture(titles[i], images[i]); 
+            pictures.add(picture); 
+        } 
+    } 
+ 
+    @Override
+    public int getCount() 
+    { 
+        if (null != pictures) 
+        { 
+            return pictures.size(); 
+        } else
+        { 
+            return 0; 
+        } 
+    } 
+ 
+    @Override
+    public Object getItem(int position) 
+    { 
+        return pictures.get(position); 
+    } 
+ 
+    @Override
+    public long getItemId(int position) 
+    { 
+        return position; 
+    } 
+ 
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) 
+    { 
+        ViewHolder viewHolder; 
+        if (convertView == null) 
+        { 
+            convertView = inflater.inflate(R.layout.catalog_pic_title, null); 
+            viewHolder = new ViewHolder(); 
+            viewHolder.name = (TextView) convertView.findViewById(R.id.name); 
+            viewHolder.image = (ImageView) convertView.findViewById(R.id.image); 
+            convertView.setTag(viewHolder); 
+        } else
+        { 
+            viewHolder = (ViewHolder) convertView.getTag(); 
+        } 
+        viewHolder.name.setText(pictures.get(position).getTitle()); 
+        viewHolder.image.setImageResource(pictures.get(position).getImageId()); 
+        return convertView; 
+    } 
+ 
+} 
+
 class ViewHolder {
 	public TextView name;
 	public ImageView image;
@@ -220,3 +284,41 @@ class Picture {
 		this.Uri = Uri;
 	}
 }
+
+class PersonalPicture 
+{ 
+    private String title; 
+    private int imageId; 
+ 
+    public PersonalPicture() 
+    { 
+        super(); 
+    } 
+ 
+    public PersonalPicture(String title, int imageId) 
+    { 
+        super(); 
+        this.title = title; 
+        this.imageId = imageId; 
+    } 
+ 
+    public String getTitle() 
+    { 
+        return title; 
+    } 
+ 
+    public void setTitle(String title) 
+    { 
+        this.title = title; 
+    } 
+ 
+    public int getImageId() 
+    { 
+        return imageId; 
+    } 
+ 
+    public void setImageId(int imageId) 
+    { 
+        this.imageId = imageId; 
+    } 
+} 

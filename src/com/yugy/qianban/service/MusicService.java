@@ -55,6 +55,10 @@ public class MusicService extends Service{
 		}
 	};
 	
+	public String getCurrentSongUrl(){
+		return songs.get(currentSongId).songUrl;
+	}
+	
 	private OnCompletionListener onCompletionListener = new OnCompletionListener() {
 		
 		@Override

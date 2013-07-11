@@ -76,38 +76,15 @@
         android:layout_below="@id/main_coverflowlayout"
         />
     
-    <ImageButton 
-        android:id="@+id/main_lastsong"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/titlebar_button_background"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/main_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/main_seekbar"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:src="@drawable/previous"
-        />
+        >
+        
+    </android.support.v4.view.ViewPager>
     
-    <ImageButton 
-        android:layout_centerHorizontal="true"
-        android:id="@+id/main_play"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/titlebar_button_background"
-        android:layout_below="@id/main_seekbar"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/play"
-        />
     
-    <ImageButton 
-        android:layout_alignParentRight="true"
-        android:id="@+id/main_nextsong"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/titlebar_button_background"
-        android:layout_below="@id/main_seekbar"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:src="@drawable/next"
-        />
     
 </RelativeLayout>

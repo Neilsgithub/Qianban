@@ -16,9 +16,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,21 +53,36 @@ import com.yugy.qianban.asisClass.LrcFormat;
 import com.yugy.qianban.asisClass.LrcProcesser;
 import com.yugy.qianban.asisClass.Rotate3DAnimation;
 import com.yugy.qianban.asisClass.Song;
+import com.yugy.qianban.database.Account;
+import com.yugy.qianban.database.DatabaseManager;
 import com.yugy.qianban.sdk.Douban;
 import com.yugy.qianban.sdk.LRC;
 import com.yugy.qianban.service.MusicService;
 import com.yugy.qianban.widget.CoverFlow;
 import com.yugy.qianban.widget.LrcView;
+import com.yugy.qianban.widget.PlayControlLeft;
+import com.yugy.qianban.widget.PlayControlRight;
 import com.yugy.qianban.widget.Titlebar;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity {
 
+	private ViewPager viewpager;
+	private ArrayList<View> views;
+	private PlayControlLeft playControlLeft;
+	private PlayControlRight playControlRight;
+	
+	private DatabaseManager database;
+	private Account account;
+	
 	private Titlebar titlebar;
 	private CoverFlow coverFlow;
-	private ImageButton previous;
+	private ImageButton last;
 	private ImageButton play;
 	private ImageButton next;
+	private ImageButton love;
+	private ImageButton ban;
+	private ImageButton download;
 	private SeekBar seekBar;
 	private TextView song;
 	private TextView author;
@@ -117,6 +135,67 @@ public class MainActivity extends Activity {
 			}
 		};
 		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+		
+		viewpager = (ViewPager)findViewById(R.id.main_viewpager);
+		views = new ArrayList<View>();
+		playControlLeft = new PlayControlLeft(this);
+		playControlRight = new PlayControlRight(this);
+		views.add(playControlLeft);
+		views.add(playControlRight);
+		
+		database = new DatabaseManager(this);
+		account = database.getAccount();
+		
+		viewpager.setAdapter(new PagerAdapter() {
+			
+			@Override
+			public boolean isViewFromObject(View arg0, Object arg1) {
+				// TODO Auto-generated method stub
+				return (arg0 == arg1);
+			}
+			
+			@Override
+			public void destroyItem(ViewGroup container, int position,
+					Object object) {
+				// TODO Auto-generated method stub
+				container.removeView(views.get(position));
+			}
+			
+			@Override
+			public int getCount() {
+				// TODO Auto-generated method stub
+				if(account == null){
+					return 1;
+				}
+				return views.size();
+			}
+			
+			@Override
+			public Object instantiateItem(ViewGroup container, int position) {
+				// TODO Auto-generated method stub
+				container.addView(views.get(position));
+				return views.get(position);
+			}
+			
+			
+		});
+		
+		last = playControlLeft.last;
+		play = playControlLeft.play;
+		next = playControlLeft.next;
+		love = playControlRight.love;
+		ban = playControlRight.ban;
+		download = playControlRight.download;
+		download.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Uri uri = Uri.parse(musicService.getCurrentSongUrl());
+				Intent downloadIntent = new Intent(Intent.ACTION_VIEW, uri);
+				startActivity(downloadIntent);
+			}
+		});
 
 		titlebar = (Titlebar) findViewById(R.id.main_titlebar);
 		titlebar.setTitle("Qianban");
@@ -124,10 +203,6 @@ public class MainActivity extends Activity {
 		titlebar.setRightButtonIcon(R.drawable.setting_button_icon);
 
 		coverFlow = (CoverFlow) findViewById(R.id.main_coverflow);
-
-		previous = (ImageButton) findViewById(R.id.main_lastsong);
-		play = (ImageButton) findViewById(R.id.main_play);
-		next = (ImageButton) findViewById(R.id.main_nextsong);
 
 		song = (TextView) findViewById(R.id.main_infosong);
 		author = (TextView) findViewById(R.id.main_infoauthor);
@@ -235,7 +310,7 @@ public class MainActivity extends Activity {
 				startActivity(intent);
 			}  
 		});
-		previous.setOnClickListener(new OnClickListener() {
+		last.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -408,7 +483,7 @@ public class MainActivity extends Activity {
 
 		public void setCoverFlowSelectable(boolean a) {
 			coverFlow.setTouchable(a);
-			previous.setClickable(a);
+			last.setClickable(a);
 			next.setClickable(a);
 			play.setClickable(a);
 		}

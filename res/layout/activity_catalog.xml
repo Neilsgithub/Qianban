@@ -28,6 +28,7 @@
                 android:textSize="12sp" />
 
             <com.yugy.qianban.widget.TagsGridView
+                android:layoutAnimation="@anim/navagation_gridview_anim"
                 android:id="@+id/private_broadcast_catalog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

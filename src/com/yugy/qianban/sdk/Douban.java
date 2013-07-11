@@ -75,45 +75,20 @@ public class Douban {
 				// TODO Auto-generated method stub
 				try {
 					result.put("hot_channels", response.getJSONObject("data").getJSONArray("channels"));
+					responseHandler.onSuccess(result);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				super.onSuccess(statusCode, response);
 			}
-		});
-		client.get("http://douban.fm/j/explore/up_trending_channels?start=0&limit=12", new JsonHttpResponseHandler(){
-			@Override
-			public void onSuccess(int statusCode, JSONObject response) {
-				// TODO Auto-generated method stub
-				try {
-					result.put("fast_channels", response.getJSONObject("data").getJSONArray("channels"));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				super.onSuccess(statusCode, response);
-			}
-		});
-		try {
-			result.put("com_channels", new JSONArray());
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		new Thread(new Runnable() {
 			
 			@Override
-			public void run() {
+			public void onFailure(Throwable error, String content) {
 				// TODO Auto-generated method stub
-				while(true){
-					if(result.has("hot_channels") && result.has("fast_channels") && result.has("com_channels")){
-						responseHandler.onSuccess(result);
-						break;
-					}
-				}
+				super.onFailure(error, content);
 			}
-		}).start();
+		});
 	}
 	
 	public void getSongs(String cid, final JsonHttpResponseHandler responseHandler){

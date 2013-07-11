@@ -84,7 +84,6 @@ public class MusicService extends Service{
 		}else{
 			return 0;
 		}
-		
 	}
 	
 	public void setPlayButton(ImageButton button){

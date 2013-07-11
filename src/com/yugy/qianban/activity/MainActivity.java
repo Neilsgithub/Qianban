@@ -501,7 +501,7 @@ public class MainActivity extends Activity {
 	}
 
 	class UIUpdateThread extends Thread {
-		private long time = 1; // 开始 的时间，不能为零，否则前面几句歌词没有显示出来
+		//private long time = 1; // 开始 的时间，不能为零，否则前面几句歌词没有显示出来
 		private boolean _run = true;
 
 		public void stopThread() {
@@ -515,7 +515,19 @@ public class MainActivity extends Activity {
 			}
 			while (_run) {
 				if(musicService.isPlaying()){
-					long sleeptime = lrc.updateIndexReturnSleeptime(time);
+					long nowPlayTime = musicService.getDuration();
+					long sleeptime = lrc.updateIndexReturnSleeptime(nowPlayTime);
+					mHandler.post(mUpdateResults);
+					if(sleeptime == -1){
+						return;
+					}
+					try {
+						Thread.sleep(sleeptime);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					/*long sleeptime = lrc.updateIndexReturnSleeptime(time);
 					time += sleeptime;
 					mHandler.post(mUpdateResults);
 					if (sleeptime == -1)
@@ -524,7 +536,7 @@ public class MainActivity extends Activity {
 						Thread.sleep(sleeptime);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
-					}
+					}*/
 				}
 			}
 		}

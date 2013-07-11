@@ -108,15 +108,24 @@ public class LrcView extends View{
 		invalidate();
 	}
 	
-	public long updateIndexReturnSleeptime(long time){
+	public long updateIndexReturnSleeptime(long time){	
 		index = lrcFormat.getCurrentIndexFromTime(time);
 		if(index == -1)
 			return -1;
 		else if(index == -2){
-			return lrcFormat.getTime(0);
+			return lrcFormat.getTime(0) - time;
 		}
-		else
-			return lrcFormat.getSleeptimeFromIndex(index);
+		else{
+			if (index >= lrcFormat.getIndex()) {
+				if (index == 0) {
+					return 100;
+				}
+				else
+					return -1;
+			}
+			else
+				return lrcFormat.getSleeptimeFromIndex(index) - time;
+		}		
 	}
 	
 	public void clear(){   //清空当前歌词

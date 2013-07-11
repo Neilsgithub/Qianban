@@ -79,10 +79,6 @@ public class LrcFormat {
 	
 	//待测
 	public long getSleeptimeFromIndex(int index){
-		if(index == this.index){
-			return 900;
-		}
-		else
-			return getTime(index + 1) - getTime(index);
+			return getTime(index + 1);
 	}
 }

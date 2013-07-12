@@ -75,6 +75,9 @@ public class MainActivity extends Activity {
 	private DatabaseManager database;
 	private Account account;
 	
+	private boolean loveSelected = false;
+	private boolean banSelected = false;
+	
 	private Titlebar titlebar;
 	private CoverFlow coverFlow;
 	private ImageButton last;
@@ -83,6 +86,7 @@ public class MainActivity extends Activity {
 	private ImageButton love;
 	private ImageButton ban;
 	private ImageButton download;
+	private ImageButton share;
 	private SeekBar seekBar;
 	private TextView song;
 	private TextView author;
@@ -184,7 +188,33 @@ public class MainActivity extends Activity {
 		play = playControlLeft.play;
 		next = playControlLeft.next;
 		love = playControlRight.love;
+		love.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(loveSelected){
+					love.setImageResource(R.drawable.love);
+				}else{
+					love.setImageResource(R.drawable.love_selected);
+				}
+				loveSelected = !loveSelected;
+			}
+		});
 		ban = playControlRight.ban;
+		ban.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(banSelected){
+					ban.setImageResource(R.drawable.ban);
+				}else{
+					ban.setImageResource(R.drawable.ban_selected);
+				}
+				banSelected = !banSelected;
+			}
+		});
 		download = playControlRight.download;
 		download.setOnClickListener(new OnClickListener() {
 			
@@ -194,6 +224,18 @@ public class MainActivity extends Activity {
 				Uri uri = Uri.parse(musicService.getCurrentSongUrl());
 				Intent downloadIntent = new Intent(Intent.ACTION_VIEW, uri);
 				startActivity(downloadIntent);
+			}
+		});
+		share = playControlRight.share;
+		share.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(Intent.ACTION_SEND);
+				intent.setType("text/plain");
+				intent.putExtra(Intent.EXTRA_TEXT, "我分享了一首不错的歌，"+author.getText()+"的《"+song.getText()+"》，你也来听听看 "+musicService.getCurrentSongUrl()+" （来自Qianban）");
+				startActivity(Intent.createChooser(intent, "选择分享方式"));
 			}
 		});
 
@@ -472,6 +514,13 @@ public class MainActivity extends Activity {
 	}
 
 	public class UIController {
+		
+		public void resetPlayController(){
+			loveSelected = false;
+			banSelected = false;
+			love.setImageResource(R.drawable.love);
+			ban.setImageResource(R.drawable.ban);
+		}
 
 		public void showProgressBar() {
 			progressBar.setVisibility(View.VISIBLE);

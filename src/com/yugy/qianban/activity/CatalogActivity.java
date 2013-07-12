@@ -79,7 +79,7 @@ public class CatalogActivity extends Activity {
 	}
 
 	private void logging() {
-		String[] titles = { "私人", "红心" };
+		String[] titles = { "私人Mhz", "红心Mhz" };
 		int[] images = { R.drawable.personal, R.drawable.like };
 		TagsGridView gridView = (TagsGridView) findViewById(R.id.private_broadcast_catalog);
 		PersonalPictureAdapter adapter = new PersonalPictureAdapter(titles,

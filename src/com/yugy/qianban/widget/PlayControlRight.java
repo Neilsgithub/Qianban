@@ -12,6 +12,7 @@ public class PlayControlRight extends RelativeLayout{
 	public ImageButton love;
 	public ImageButton ban;
 	public ImageButton download;
+	public ImageButton share;
 	
 	
 	public PlayControlRight(Context context) {
@@ -26,6 +27,7 @@ public class PlayControlRight extends RelativeLayout{
 		love = (ImageButton)findViewById(R.id.playcontrol_love);
 		ban = (ImageButton)findViewById(R.id.playcontrol_ban);
 		download = (ImageButton)findViewById(R.id.playcontrol_download);
+		share = (ImageButton)findViewById(R.id.playcontrol_share);
 	}
 	
 }

@@ -48,6 +48,7 @@ public class MusicService extends Service{
 		@Override
 		public void onPrepared(MediaPlayer mp) {
 			controller.hideProgressBar();
+			controller.resetPlayController();
 			controller.setCoverFlowSelectable(true);
 			mediaPlayer.start();
 			seekBar.setMax(mediaPlayer.getDuration());

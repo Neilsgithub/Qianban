@@ -1,8 +1,6 @@
 package com.yugy.qianban.activity;
 
 import com.yugy.qianban.R;
-import com.yugy.qianban.R.layout;
-import com.yugy.qianban.R.menu;
 import com.yugy.qianban.asisClass.Conf;
 import com.yugy.qianban.database.Account;
 import com.yugy.qianban.database.DatabaseManager;
@@ -10,7 +8,6 @@ import com.yugy.qianban.sdk.Douban;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;

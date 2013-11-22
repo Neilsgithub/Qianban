@@ -42,7 +42,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.fedorvlasov.lazylist.ImageLoader;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yugy.qianban.R;
@@ -53,6 +52,7 @@ import com.yugy.qianban.asisClass.LrcFormat;
 import com.yugy.qianban.asisClass.LrcProcesser;
 import com.yugy.qianban.asisClass.Rotate3DAnimation;
 import com.yugy.qianban.asisClass.Song;
+import com.yugy.qianban.asisClass.imageLoader.ImageLoader;
 import com.yugy.qianban.database.Account;
 import com.yugy.qianban.database.DatabaseManager;
 import com.yugy.qianban.sdk.Douban;

@@ -6,7 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.fedorvlasov.lazylist.ImageLoader;
+import com.yugy.qianban.asisClass.imageLoader.ImageLoader;
 import com.yugy.qianban.R;
 import com.yugy.qianban.asisClass.Conf;
 import com.yugy.qianban.database.Account;
